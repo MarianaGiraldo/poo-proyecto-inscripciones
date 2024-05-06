@@ -1,13 +1,18 @@
 # !/usr/bin/python3
 # -*- coding: utf-8 -*-
+import logging
 import tkinter as tk
 import tkinter.ttk as ttk
 import sqlite3
+from pathlib import Path
 
+logger = logging.getLogger(__name__)
+PATH = str((Path(__file__).resolve()).parent)
+DB_PATH = f"{PATH}/db/Inscripciones.db"
 class Inscripciones:
-    def __init__(self, master=None):
+    def __init__(self, master=None):\
         # Ventana principal
-        self.db_name = 'Inscripciones.db'
+        self.db_name = DB_PATH
         self.win = self.create_main_window(master)
 
         # Crea los frames
@@ -139,6 +144,23 @@ class Inscripciones:
         scroll_Y.place(anchor="s", height=275, width=12, x=790, y=582)
         return scroll_H, scroll_Y
 
+    def execute_db_query(self, query):
+        """
+        The function `execute_db_query` executes a given SQL query on a SQLite database and logs any
+        errors encountered.
+        
+        :param query: The `query` parameter in the `execute_db_query` function is a SQL query that you
+        want to execute on the SQLite database. This query can be any valid SQL statement such as
+        SELECT, INSERT, UPDATE, DELETE, etc. The function will execute this query on the SQLite database
+        """
+        try:
+            with sqlite3.connect(self.db_name) as conn:
+                cursor = conn.cursor()
+                cursor.execute(query)
+                conn.commit()
+        except sqlite3.Error as e:
+            logger.error("Error executing SQLite query: %s", e)
+    
     def run(self):
         self.mainwindow.mainloop()
 
