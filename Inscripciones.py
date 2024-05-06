@@ -137,6 +137,8 @@ class Inscripciones:
 
     ''' A partir de este punto se deben incluir las funciones
      para el manejo de la base de datos '''
+    def test():
+        print("Test")
 
 if __name__ == "__main__":
     app = Inscripciones()
