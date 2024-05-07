@@ -24,6 +24,8 @@ class Inscripciones:
         self.create_entries(self.frm_1)
         ''' Botones  de la Aplicación'''
         self.create_buttons(self.frm_1)
+        # Llenar los combobox
+        self.fill_cmboxes()
         #Separador
         separator1 = ttk.Separator(self.frm_1)
         separator1.configure(orient="horizontal")
@@ -65,9 +67,9 @@ class Inscripciones:
         #Label Curso
         self.lblIdCurso = self.create_label(frm_1, "lblidcurso", 'Id Curso:', x=20, y=185)
         #Label Descripción del Curso
-        self.lblDscCurso = self.create_label(frm_1, "lbldsccurso", 'Curso:', x=275, y=185)
+        self.lblDscCurso = self.create_label(frm_1, "lbldsccurso", 'Curso:', x=221, y=185)
         #Label Horario
-        self.lblHorario = self.create_label(frm_1, "label3", 'Hora:', x=635, y=185)
+        self.lblHorario = self.create_label(frm_1, "lblhorario", 'Horario:', x=581, y=185)
         
     def create_label(self, parent, name, text, x, y, bold=False):
         lbl = ttk.Label(parent, name=name)
@@ -88,11 +90,11 @@ class Inscripciones:
         #Entry Apellidos
         self.apellidos = self.create_entry(frm_1, "apellidos", None, width=200, x=485, y=130)
         #Entry Curso
-        self.id_Curso = self.create_entry(frm_1, "id_curso", "left", width=166, x=100, y=185)
+        self.cmbx_Id_Curso = self.create_combobox(frm_1, "cmbx_id_curso", width=112, x=100, y=185)
         #Entry de Descripción del Curso 
-        self.descripc_Curso = self.create_entry(frm_1, "descripc_curso", "left", width=300, x=325, y=185)
+        self.descripc_Curso = self.create_entry(frm_1, "descripc_curso", "left", width=300, x=271, y=185)
         #Entry del Horario
-        self.horario = self.create_entry(frm_1, "entry3", "left", width=100, x=680, y=185)
+        self.horario = self.create_entry(frm_1, "horario", "left", width=140, x=640, y=185)
 
     def create_entry(self, parent, name, justify, width, x, y):
         entry = ttk.Entry(parent, name=name)
@@ -145,6 +147,14 @@ class Inscripciones:
         scroll_Y.place(anchor="s", height=275, width=12, x=790, y=582)
         return scroll_H, scroll_Y
 
+    def fill_cmboxes(self):
+        #Llenar el combobox de Alumnos
+        alumnos = self.get_all_from_table("Alumnos", "Id_Alumno")
+        self.cmbx_Id_Alumno["values"] = [alumno[0] for alumno in alumnos]
+        #Llenar el combobox de Cursos
+        cursos = self.get_all_from_table("Cursos", "Codigo_Curso")
+        self.cmbx_Id_Curso["values"] = [curso[0] for curso in cursos]
+        
     
     def run(self):
         self.mainwindow.mainloop()
@@ -155,12 +165,14 @@ class Inscripciones:
 
     def execute_db_query(self, query, params=()) -> Union[sqlite3.Cursor, None]:
         """
-        The function `execute_db_query` executes a given SQL query on a SQLite database and logs any
-        errors encountered.
-        
-        :param query: The `query` parameter in the `execute_db_query` function is a SQL query that you
-        want to execute on the SQLite database. This query can be any valid SQL statement such as
-        SELECT, INSERT, UPDATE, DELETE, etc. The function will execute this query on the SQLite database
+        Executes a database query and returns the result.
+
+        Args:
+            query (str): The SQL query to execute.
+            params (tuple, optional): The parameters to be used in the query. Defaults to ().
+
+        Returns:
+            Union[sqlite3.Cursor, None]: The result of the query as a cursor object, or None if an error occurred.
         """
         try:
             with sqlite3.connect(self.db_name) as conn:
@@ -172,6 +184,38 @@ class Inscripciones:
             logger.error("Error executing SQLite query: %s", e)
         return None
 
+    def get_all_from_table(self, table_name, fields: str = "*"):
+        """
+        Retrieves all records from a specified table in the database.
+
+        Args:
+            table_name (str): The name of the table to retrieve records from.
+            fields (str, optional): The fields to retrieve from the table. Defaults to "*".
+
+        Returns:
+            list: A list of records retrieved from the table. Each record is represented as a tuple.
+        """
+        query = f"SELECT {fields} FROM {table_name}"
+        result = self.execute_db_query(query)
+        return result.fetchall() if result else []
+    
+    def get_one_from_table(self, table_name, fields: str = "*", where: tuple = ()):
+        """
+        Retrieves a single row from the specified table based on the given conditions.
+
+        Args:
+            table_name (str): The name of the table to retrieve data from.
+            fields (str, optional): The fields to retrieve from the table. Defaults to "*".
+            where (tuple, optional): A tuple representing the condition to filter the data. 
+                                    The first element is the column name and the second element is the value to match. 
+                                    Defaults to an empty tuple.
+
+        Returns:
+            tuple: A single row from the table that matches the given conditions, or an empty list if no match is found.
+        """
+        query = f"SELECT {fields} FROM {table_name} WHERE {where[0]} = ?"
+        result = self.execute_db_query(query, where[1])
+        return result.fetchone() if result else []
 
 if __name__ == "__main__":
     app = Inscripciones()
