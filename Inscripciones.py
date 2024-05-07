@@ -145,6 +145,14 @@ class Inscripciones:
         scroll_Y.place(anchor="s", height=275, width=12, x=790, y=582)
         return scroll_H, scroll_Y
 
+    
+    def run(self):
+        self.mainwindow.mainloop()
+
+
+    ''' A partir de este punto se deben incluir las funciones
+    para el manejo de la base de datos '''
+
     def execute_db_query(self, query, params=()) -> Union[sqlite3.Cursor, None]:
         """
         The function `execute_db_query` executes a given SQL query on a SQLite database and logs any
@@ -163,13 +171,6 @@ class Inscripciones:
         except sqlite3.Error as e:
             logger.error("Error executing SQLite query: %s", e)
         return None
-    
-    def run(self):
-        self.mainwindow.mainloop()
-
-
-    ''' A partir de este punto se deben incluir las funciones
-     para el manejo de la base de datos '''
 
 
 if __name__ == "__main__":
