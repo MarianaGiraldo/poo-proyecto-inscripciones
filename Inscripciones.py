@@ -5,6 +5,7 @@ import tkinter as tk
 import tkinter.ttk as ttk
 import sqlite3
 from pathlib import Path
+from typing import Union
 
 logger = logging.getLogger(__name__)
 PATH = str((Path(__file__).resolve()).parent)
@@ -144,7 +145,7 @@ class Inscripciones:
         scroll_Y.place(anchor="s", height=275, width=12, x=790, y=582)
         return scroll_H, scroll_Y
 
-    def execute_db_query(self, query):
+    def execute_db_query(self, query, params=()) -> Union[sqlite3.Cursor, None]:
         """
         The function `execute_db_query` executes a given SQL query on a SQLite database and logs any
         errors encountered.
@@ -156,10 +157,12 @@ class Inscripciones:
         try:
             with sqlite3.connect(self.db_name) as conn:
                 cursor = conn.cursor()
-                cursor.execute(query)
+                result = cursor.execute(query, params)
                 conn.commit()
+                return result
         except sqlite3.Error as e:
             logger.error("Error executing SQLite query: %s", e)
+        return None
     
     def run(self):
         self.mainwindow.mainloop()
