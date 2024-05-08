@@ -127,13 +127,22 @@ class Inscripciones:
     def create_treeview(self, frm_1):
         tView = ttk.Treeview(frm_1, name="tview")
         tView.configure(selectmode="extended")
-        tView_cols = ['tV_descripción']
-        tView_dcols = ['tV_descripción']
-        tView.configure(columns=tView_cols,displaycolumns=tView_dcols)
-        tView.column("#0",anchor="w",stretch=True,width=10,minwidth=10)
-        tView.column("tV_descripción",anchor="w",stretch=True,width=200,minwidth=50)
-        tView.heading("#0", anchor="w", text='Curso')
-        tView.heading("tV_descripción", anchor="w", text='Descripción')
+    
+        config_map = {
+            "#0": {"width": 7, "minwidth": 7, "heading": '# Inscripción'},
+            "curso": {"width": 30, "minwidth": 20, "heading": 'Curso'},
+            "id_alumno": {"width": 30, "minwidth": 20, "heading": 'Id Alumno'},
+            "tV_descripción": {"width": 50, "minwidth": 30, "heading": 'Descripción'},
+            "horario": {"width": 30, "minwidth": 20, "heading": 'Horario'}
+        }
+    
+        cols = list(config_map.keys())
+        tView.configure(columns=cols[1:], displaycolumns=cols[1:])
+    
+        for col, config in config_map.items():
+            tView.column(col, anchor="w", stretch=True, width=config["width"], minwidth=config["minwidth"])
+            tView.heading(col, anchor="w", text=config["heading"])
+    
         tView.place(anchor="nw", height=300, width=790, x=4, y=300)
         return tView
 
