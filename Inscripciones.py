@@ -147,13 +147,56 @@ class Inscripciones:
         scroll_Y.place(anchor="s", height=275, width=12, x=790, y=582)
         return scroll_H, scroll_Y
 
+    def fill_alumno_data(self, _):
+        """
+        This function is triggered when a selection is made in the 'cmbx_Id_Alumno' combobox.
+        It fetches the selected student's data from the 'Alumnos' table and fills the 'nombres' and 'apellidos' fields.
+    
+        Args:
+            _: This argument is not used in the function. It is included because this function is used as an event handler, which always receive an event object as an argument.
+        """
+        #  Obtain the selected student's ID
+        id_alumno = self.cmbx_Id_Alumno.get()
+        # Fetch the selected student's data
+        alumno = self.get_one_from_table("Alumnos", "Nombres, Apellidos", ("Id_Alumno", id_alumno))
+        if len(alumno) > 0:
+            self.nombres.delete(0, tk.END)
+            self.nombres.insert(0, alumno[0])
+            self.apellidos.delete(0, tk.END)
+            self.apellidos.insert(0, alumno[1])
+    
+    def fill_curso_data(self, _):
+        """
+        This function is triggered when a selection is made in the 'cmbx_Id_Curso' combobox.
+        It fetches the selected course's data from the 'Cursos' table and fills the 'descripc_Curso' field.
+    
+        Args:
+            _: This argument is not used in the function. It is included because this function is used as an event handler, which always receive an event object as an argument.
+        """
+        #  Obtain the selected course's ID
+        id_curso = self.cmbx_Id_Curso.get()
+        # Fetch the selected course's data
+        curso = self.get_one_from_table("Cursos", "Descrip_Curso", ("Codigo_Curso", id_curso))
+        if len(curso) > 0:
+            self.descripc_Curso.delete(0, tk.END)
+            self.descripc_Curso.insert(0, curso[0])
+    
     def fill_cmboxes(self):
-        #Llenar el combobox de Alumnos
+        """
+        This function fills the 'cmbx_Id_Alumno' and 'cmbx_Id_Curso' comboboxes with data from the 'Alumnos' and 'Cursos' tables respectively.
+        It also binds the '<<ComboboxSelected>>' event to the 'fill_alumno_data' and 'fill_curso_data' functions for the respective comboboxes.
+        """
+        # Fill the 'cmbx_Id_Alumno' combobox with data
         alumnos = self.get_all_from_table("Alumnos", "Id_Alumno")
         self.cmbx_Id_Alumno["values"] = [alumno[0] for alumno in alumnos]
-        #Llenar el combobox de Cursos
+        # Bind the '<<ComboboxSelected>>' event to the 'fill_alumno_data' function
+        self.cmbx_Id_Alumno.bind("<<ComboboxSelected>>", self.fill_alumno_data)
+    
+        # Fill the 'cmbx_Id_Curso' combobox with data
         cursos = self.get_all_from_table("Cursos", "Codigo_Curso")
         self.cmbx_Id_Curso["values"] = [curso[0] for curso in cursos]
+        # Bind the '<<ComboboxSelected>>' event to the 'fill_curso_data' function
+        self.cmbx_Id_Curso.bind("<<ComboboxSelected>>", self.fill_curso_data)
         
     
     def run(self):
@@ -214,7 +257,7 @@ class Inscripciones:
             tuple: A single row from the table that matches the given conditions, or an empty list if no match is found.
         """
         query = f"SELECT {fields} FROM {table_name} WHERE {where[0]} = ?"
-        result = self.execute_db_query(query, where[1])
+        result = self.execute_db_query(query, (where[1],))
         return result.fetchone() if result else []
 
 if __name__ == "__main__":
