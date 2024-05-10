@@ -3,9 +3,11 @@
 import logging
 import tkinter as tk
 import tkinter.ttk as ttk
+from tkinter import messagebox as mssg
 import sqlite3
 from pathlib import Path
 from typing import Union
+from datetime import datetime
 
 logger = logging.getLogger(__name__)
 PATH = str((Path(__file__).resolve()).parent)
@@ -83,6 +85,9 @@ class Inscripciones:
         self.num_Inscripcion = self.create_entry(frm_1, "num_inscripcion", "right", width=100, x=682, y=42)
         # Entry Fecha
         self.fecha = self.create_entry(frm_1, "fecha", "center", width=90, x=680, y=80)
+        self.fecha.bind("<KeyRelease>",self.valida_Fecha)
+        self.fecha.bind("<BackSpace>",lambda _:self.fecha.delete(len(self.fecha.get())),"end")
+        self.fecha.bind("<FocusOut>", self.fecha_Valida)
         #Combobox Alumno
         self.cmbx_Id_Alumno = self.create_combobox(frm_1, "cmbx_id_alumno", width=112, x=100, y=80)
         #Entry Alumno
@@ -102,6 +107,35 @@ class Inscripciones:
             entry.configure(justify=justify)
         entry.place(anchor="nw", width=width, x=x, y=y)
         return entry
+    def create_entry(fecha, parent="frm_1", name="fecha", justify="center", width=90, x=680, y=80):
+        entry = ttk.Entry(parent, name=name)
+        if justify == "center":  
+            entry.configure(justify=justify)
+        entry.place(anchor="nw", width=width, x=x, y=y)
+        entry.config(validate="key", validatecommand=(entry.register(lambda text: len(text) < 11), "%P"))
+        return entry
+    def valida_Fecha(self,event=None):
+        if event.char.isdigit():
+            campo=self.fecha.get()
+            #if len(campo)>10:
+             #   mssg.showerror("Atención - Máximo 10 caracteres")
+              #  self.fecha.delete(10,"end")
+            letras=0
+            for i in campo:
+                letras +=1
+            if letras ==2:self.fecha.insert(2,"/")
+            if letras ==5:self.fecha.insert(6,"/")
+        else:
+            return "break"
+    def fecha_Valida(self):
+        while True:
+            try:
+                dia,mes,anio=map(int,self.fecha.get().split("/"))
+                datetime(anio,mes,dia)
+                
+            except ValueError:
+                mssg.showerror("Error fecha equivocada")
+                return False
 
     def create_combobox(self, parent, name, width, x, y):
         cmbx = ttk.Combobox(parent, name=name)
