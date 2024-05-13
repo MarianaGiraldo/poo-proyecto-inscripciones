@@ -85,6 +85,7 @@ class Inscripciones:
         self.num_Inscripcion = self.create_entry(frm_1, "num_inscripcion", "right", width=100, x=682, y=42)
         # Entry Fecha
         self.fecha = self.create_entry(frm_1, "fecha", "center", width=90, x=680, y=80)
+        self.fecha.config(validate="key", validatecommand=(self.fecha.register(lambda text: len(text) < 11), "%P"))
         self.fecha.bind("<KeyRelease>",self.valida_Fecha)
         self.fecha.bind("<BackSpace>",lambda _:self.fecha.delete(len(self.fecha.get())),"end")
         self.fecha.bind("<FocusOut>", self.fecha_Valida)
@@ -107,19 +108,10 @@ class Inscripciones:
             entry.configure(justify=justify)
         entry.place(anchor="nw", width=width, x=x, y=y)
         return entry
-    def create_entry(fecha, parent="frm_1", name="fecha", justify="center", width=90, x=680, y=80):
-        entry = ttk.Entry(parent, name=name)
-        if justify == "center":  
-            entry.configure(justify=justify)
-        entry.place(anchor="nw", width=width, x=x, y=y)
-        entry.config(validate="key", validatecommand=(entry.register(lambda text: len(text) < 11), "%P"))
-        return entry
+    
     def valida_Fecha(self,event=None):
         if event.char.isdigit():
             campo=self.fecha.get()
-            #if len(campo)>10:
-             #   mssg.showerror("Atención - Máximo 10 caracteres")
-              #  self.fecha.delete(10,"end")
             letras=0
             for i in campo:
                 letras +=1
