@@ -142,11 +142,11 @@ class Inscripciones:
         # Botón de nueva inscripción
         self.btnNuevaInscripcion = self.create_button(frm_1, "btnnuevainscripcion", 'Nueva Inscripción', x=570, y=42, command=self.nueva_Inscripcion)
         #Botón Guardar
-        self.btnGuardar = self.create_button(frm_1, "btnguardar", 'Guardar', x=200, y=260)
+        self.btnGuardar = self.create_button(frm_1, "btnguardar", 'Guardar', x=200, y=260,command=self.crear_Inscripcion)
         #Botón Editar
-        self.btnEditar = self.create_button(frm_1, "btneditar", 'Editar', x=300, y=260)
+        self.btnEditar = self.create_button(frm_1, "btneditar", 'Editar', x=300, y=260,command=self.actualizar_Inscripcion)
         #Botón Eliminar
-        self.btnEliminar = self.create_button(frm_1, "btneliminar", 'Eliminar', x=400, y=260)
+        self.btnEliminar = self.create_button(frm_1, "btneliminar", 'Eliminar', x=400, y=260,command=lambda:self.eliminar_Inscripcion(self.num_Inscripcion.get()))
         #Botón Cancelar
         self.btnCancelar = self.create_button(frm_1, "btncancelar", 'Cancelar', x=500, y=260)
 
@@ -155,6 +155,35 @@ class Inscripciones:
         btn.place(anchor="nw", x=x, y=y)
         return btn
     
+    def crear_Inscripcion(self):
+        num_inscripcion = self.num_Inscripcion.get()
+        id_alumno = self.cmbx_Id_Alumno.get()
+        fecha = self.fecha.get()
+        codigo_curso = self.cmbx_Id_Curso.get()
+        horario = self.horario.get()
+
+        query = "INSERT INTO Inscritos (No_Inscripcion, Id_Alumno, Fecha_Inscripcion, Codigo_Curso, Horario) VALUES (?, ?, ?, ?, ?)"
+        params = (num_inscripcion, id_alumno, fecha, codigo_curso, horario)
+
+        self.execute_db_query(query, params)
+        self.fill_inscritos()  # Actualiza la vista del treeview
+
+    def leer_Inscripcion(self, num_inscripcion):
+        query = "SELECT * FROM Inscritos WHERE No_Inscripcion = ?"
+        result = self.execute_db_query(query, (num_inscripcion,))
+        return result.fetchone()
+
+    def actualizar_Inscripcion(self, num_inscripcion, id_alumno, fecha, codigo_curso, horario):
+        query = "UPDATE Inscritos SET Id_Alumno = ?, Fecha_Inscripcion = ?, Codigo_Curso = ?, Horario = ? WHERE No_Inscripcion = ?"
+        params = (id_alumno, fecha, codigo_curso, horario, num_inscripcion)
+        self.execute_db_query(query, params)
+        self.fill_inscritos()  # Actualiza la vista del treeview
+
+    def eliminar_Inscripcion(self, num_inscripcion):
+        query = "DELETE FROM Inscritos WHERE No_Inscripcion = ?"
+        self.execute_db_query(query, (num_inscripcion,))
+        self.fill_inscritos()  # Actualiza la vista del treeview
+
     def create_treeview(self, frm_1):
         tView = ttk.Treeview(frm_1, name="tview")
         tView.configure(selectmode="extended")
