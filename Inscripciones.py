@@ -86,9 +86,9 @@ class Inscripciones:
         # Entry Fecha
         self.fecha = self.create_entry(frm_1, "fecha", "center", width=90, x=680, y=80)
         self.fecha.config(validate="key", validatecommand=(self.fecha.register(lambda text: len(text) < 11), "%P"))
-        self.fecha.bind("<KeyRelease>",self.valida_Fecha)
+        self.fecha.bind("<KeyRelease>",self.format_Date_Input)
         self.fecha.bind("<BackSpace>",lambda _:self.fecha.delete(len(self.fecha.get())),"end")
-        self.fecha.bind("<FocusOut>", self.fecha_Valida)
+        self.fecha.bind("<FocusOut>", self.is_Valid_Date)
         #Combobox Alumno
         self.cmbx_Id_Alumno = self.create_combobox(frm_1, "cmbx_id_alumno", width=112, x=100, y=80)
         #Entry Alumno
@@ -109,7 +109,7 @@ class Inscripciones:
         entry.place(anchor="nw", width=width, x=x, y=y)
         return entry
     
-    def valida_Fecha(self,event=None):
+    def format_Date_Input(self,event=None):
         if event.char.isdigit():
             campo=self.fecha.get()
             letras=0
@@ -119,7 +119,8 @@ class Inscripciones:
             if letras ==5:self.fecha.insert(6,"/")
         else:
             return "break"
-    def fecha_Valida(self, _):
+
+    def is_Valid_Date(self, _):
         while True:
             try:
                 dia,mes,anio=map(int,self.fecha.get().split("/"))
