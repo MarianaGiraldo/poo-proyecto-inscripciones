@@ -136,6 +136,8 @@ class Inscripciones:
         return cmbx
     
     def create_buttons(self, frm_1):
+        # Botón de nueva inscripción
+        self.btnNuevaInscripcion = self.create_button(frm_1, "btnnuevainscripcion", 'Nueva Inscripción', x=570, y=42, command=self.nueva_Inscripcion)
         #Botón Guardar
         self.btnGuardar = self.create_button(frm_1, "btnguardar", 'Guardar', x=200, y=260)
         #Botón Editar
@@ -145,9 +147,8 @@ class Inscripciones:
         #Botón Cancelar
         self.btnCancelar = self.create_button(frm_1, "btncancelar", 'Cancelar', x=500, y=260)
 
-    def create_button(self, parent, name, text, x, y):
-        btn = ttk.Button(parent, name=name)
-        btn.configure(text=text)
+    def create_button(self, parent, name, text, x, y, command = (lambda: None)):
+        btn = ttk.Button(parent, name=name, text=text, command=command)
         btn.place(anchor="nw", x=x, y=y)
         return btn
     
@@ -226,7 +227,6 @@ class Inscripciones:
         for record in result:
             self.tView.insert("", tk.END, text=record.num_inscripcion, values=(record.codigo_curso, record.id_alumno, record.desc_curso, record.horario))
 
-    
     def fill_cmboxes(self):
         """
         This function fills the 'cmbx_Id_Alumno' and 'cmbx_Id_Curso' comboboxes with data from the 'Alumnos' and 'Cursos' tables respectively.
@@ -255,6 +255,13 @@ class Inscripciones:
         self.num_Inscripcion['state'] = 'readonly'
         self.num_Inscripcion.bind("<<ComboboxSelected>>", self.fill_inscritos)
         
+    def nueva_Inscripcion(self):
+        """
+        This function is triggered when the 'Nueva Inscripción' button is clicked.
+        It clears the entries and comboboxes to allow the user to create a new registration.
+        """
+        self.num_Inscripcion.set(self.get_next_inscripcion())
+        self.tView.delete(*self.tView.get_children())
     
     def run(self):
         self.mainwindow.mainloop()
@@ -333,6 +340,16 @@ class Inscripciones:
         result = self.execute_db_query(query, (num_inscripcion,))
         return [Inscritos(*record) for record in result.fetchall()] if result else []
 
+    def get_next_inscripcion(self):
+        """
+        Retrieves the next available 'No_Inscripcion' value from the 'Inscritos' table.
+
+        Returns:
+            int: The next available 'No_Inscripcion' value.
+        """
+        query = "SELECT MAX(No_Inscripcion) FROM Inscritos"
+        result = self.execute_db_query(query)
+        return result.fetchone()[0] + 1 if result else 1
 
 class Inscritos:
     table_Name = "Inscritos"
