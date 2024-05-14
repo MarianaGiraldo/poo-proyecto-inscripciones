@@ -116,7 +116,9 @@ class Inscripciones:
             for i in campo:
                 letras +=1
             if letras ==2:self.fecha.insert(2,"/")
-            if letras ==5:self.fecha.insert(6,"/")
+            if letras ==5:self.fecha.insert(6,"/")        
+        elif event.char.isspace():
+            self.fecha.delete(len(self.fecha.get()) - 1)
         else:
             return "break"
 
@@ -129,6 +131,7 @@ class Inscripciones:
             except ValueError:
                 mssg.showerror("Error fecha equivocada")
                 return False
+    
 
     def create_combobox(self, parent, name, width, x, y):
         cmbx = ttk.Combobox(parent, name=name)
