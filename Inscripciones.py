@@ -158,12 +158,12 @@ class Inscripciones:
     def crear_Inscripcion(self):
         num_inscripcion = self.num_Inscripcion.get()
         id_alumno = self.cmbx_Id_Alumno.get()
-        fecha = self.fecha.get()
         codigo_curso = self.cmbx_Id_Curso.get()
+        descrip_Curso=self.descripc_Curso.get()
         horario = self.horario.get()
 
-        query = "INSERT INTO Inscritos (No_Inscripcion, Id_Alumno, Fecha_Inscripcion, Codigo_Curso, Horario) VALUES (?, ?, ?, ?, ?)"
-        params = (num_inscripcion, id_alumno, fecha, codigo_curso, horario)
+        query = "INSERT INTO Inscritos (No_Inscripcion, Codigo_Curso, Id_Alumno, Descrip_Curso , Horario) VALUES (?, ?, ?, ?, ?)"
+        params = (num_inscripcion, codigo_curso, id_alumno, descrip_Curso, horario)
 
         self.execute_db_query(query, params)
         self.fill_inscritos()  # Actualiza la vista del treeview
@@ -171,11 +171,11 @@ class Inscripciones:
     def leer_Inscripcion(self, num_inscripcion):
         query = "SELECT * FROM Inscritos WHERE No_Inscripcion = ?"
         result = self.execute_db_query(query, (num_inscripcion,))
-        return result.fetchone()
+        return result.fetchall()
 
-    def actualizar_Inscripcion(self, num_inscripcion, id_alumno, fecha, codigo_curso, horario):
-        query = "UPDATE Inscritos SET Id_Alumno = ?, Fecha_Inscripcion = ?, Codigo_Curso = ?, Horario = ? WHERE No_Inscripcion = ?"
-        params = (id_alumno, fecha, codigo_curso, horario, num_inscripcion)
+    def actualizar_Inscripcion(self, num_inscripcion, codigo_curso,id_alumno, descrip_Curso, horario):
+        query = "UPDATE Inscritos SET Codigo_Curso = ?, Id_Alumno = ?, Descrip_Curso = ?, Horario = ? WHERE No_Inscripcion = ?"
+        params = (num_inscripcion, codigo_curso, id_alumno, descrip_Curso, horario )
         self.execute_db_query(query, params)
         self.fill_inscritos()  # Actualiza la vista del treeview
 
