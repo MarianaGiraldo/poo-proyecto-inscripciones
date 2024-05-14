@@ -43,3 +43,18 @@ VALUES
     ('PSI_SOC', 'Psicología Social', 4),
     ('ING_SOFT', 'Ingeniería de Software', 6),
     ('DER_CIV', 'Derecho Civil', 5);
+    
+INSERT INTO Inscritos (No_Inscripcion, Id_Alumno, Codigo_Curso, Fecha_Inscripcion, Horario)
+VALUES
+    (1, '1032793456', 'TGS_1', '2024-02-01', '4:00-6:00 pm'),
+    (1, '1032793456', 'MAT_BAS', '2024-02-01', '4:00-6:00 pm'),
+    (1, '1032793456', 'ADM_FIN', '2024-02-01', '8:00-12:00 m'),
+    (1, '1093723491', 'FIS_1', '2023-05-20', '4:00-6:00 pm'),
+    (2, '1093723491', 'ECO_MIC', '2023-05-20', '6:00-8:00 pm'),
+    (2, '1093723491', 'COMP_PROG', '2023-05-20', '8:00-12:00 m'),
+    (2, '1029387856', 'ADM_EMP', '2022-11-25', '6:00-8:00 pm'),
+    (3, '1029387856', 'PSI_SOC', '2022-11-25', '6:00-8:00 pm'),
+    (3, '1029387856', 'ING_SOFT', '2022-11-25', '8:00-12:00 m'),
+    (3, '1237654321', 'DER_CIV', '2021-07-15', '6:00-8:00 pm');
+    
+SELECT No_Inscripcion FROM Inscritos GROUP BY No_Inscripcion ORDER BY No_Inscripcion ASC

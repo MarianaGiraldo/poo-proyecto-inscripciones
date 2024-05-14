@@ -82,7 +82,7 @@ class Inscripciones:
     
     def create_entries(self, frm_1):
         #Entry No. Inscripción
-        self.num_Inscripcion = self.create_entry(frm_1, "num_inscripcion", "right", width=100, x=682, y=42)
+        self.num_Inscripcion = self.create_combobox(frm_1, "cmbx_num_inscripcion", width=100, x=682, y=42)
         # Entry Fecha
         self.fecha = self.create_entry(frm_1, "fecha", "center", width=90, x=680, y=80)
         self.fecha.config(validate="key", validatecommand=(self.fecha.register(lambda text: len(text) < 11), "%P"))
@@ -139,6 +139,8 @@ class Inscripciones:
         return cmbx
     
     def create_buttons(self, frm_1):
+        # Botón de nueva inscripción
+        self.btnNuevaInscripcion = self.create_button(frm_1, "btnnuevainscripcion", 'Nueva Inscripción', x=570, y=42, command=self.nueva_Inscripcion)
         #Botón Guardar
         self.btnGuardar = self.create_button(frm_1, "btnguardar", 'Guardar', x=200, y=260)
         #Botón Editar
@@ -148,9 +150,8 @@ class Inscripciones:
         #Botón Cancelar
         self.btnCancelar = self.create_button(frm_1, "btncancelar", 'Cancelar', x=500, y=260)
 
-    def create_button(self, parent, name, text, x, y):
-        btn = ttk.Button(parent, name=name)
-        btn.configure(text=text)
+    def create_button(self, parent, name, text, x, y, command = (lambda: None)):
+        btn = ttk.Button(parent, name=name, text=text, command=command)
         btn.place(anchor="nw", x=x, y=y)
         return btn
     
@@ -198,10 +199,10 @@ class Inscripciones:
         id_alumno = self.cmbx_Id_Alumno.get()
         # Fetch the selected student's data
         alumno = self.get_one_from_table("Alumnos", "Nombres, Apellidos", ("Id_Alumno", id_alumno))
+        self.nombres.delete(0, tk.END)
+        self.apellidos.delete(0, tk.END)
         if len(alumno) > 0:
-            self.nombres.delete(0, tk.END)
             self.nombres.insert(0, alumno[0])
-            self.apellidos.delete(0, tk.END)
             self.apellidos.insert(0, alumno[1])
     
     def fill_curso_data(self, _):
@@ -216,10 +217,19 @@ class Inscripciones:
         id_curso = self.cmbx_Id_Curso.get()
         # Fetch the selected course's data
         curso = self.get_one_from_table("Cursos", "Descrip_Curso", ("Codigo_Curso", id_curso))
+        self.descripc_Curso.delete(0, tk.END)
         if len(curso) > 0:
-            self.descripc_Curso.delete(0, tk.END)
             self.descripc_Curso.insert(0, curso[0])
-    
+            
+    def fill_inscritos(self, _):
+        result = self.get_data_from_inscritos(self.num_Inscripcion.get())
+        # Clear the treeView
+        self.tView.delete(*self.tView.get_children())
+        
+        # Fill treeView with data
+        for record in result:
+            self.tView.insert("", tk.END, text=record.num_inscripcion, values=(record.codigo_curso, record.id_alumno, record.desc_curso, record.horario))
+
     def fill_cmboxes(self):
         """
         This function fills the 'cmbx_Id_Alumno' and 'cmbx_Id_Curso' comboboxes with data from the 'Alumnos' and 'Cursos' tables respectively.
@@ -228,15 +238,33 @@ class Inscripciones:
         # Fill the 'cmbx_Id_Alumno' combobox with data
         alumnos = self.get_all_from_table("Alumnos", "Id_Alumno")
         self.cmbx_Id_Alumno["values"] = [alumno[0] for alumno in alumnos]
+        # prevent typing a value
+        self.cmbx_Id_Alumno['state'] = 'readonly'
         # Bind the '<<ComboboxSelected>>' event to the 'fill_alumno_data' function
         self.cmbx_Id_Alumno.bind("<<ComboboxSelected>>", self.fill_alumno_data)
-    
+
         # Fill the 'cmbx_Id_Curso' combobox with data
         cursos = self.get_all_from_table("Cursos", "Codigo_Curso")
         self.cmbx_Id_Curso["values"] = [curso[0] for curso in cursos]
+        # Prevent from typing a value
+        self.cmbx_Id_Curso['state'] = 'readonly'
         # Bind the '<<ComboboxSelected>>' event to the 'fill_curso_data' function
         self.cmbx_Id_Curso.bind("<<ComboboxSelected>>", self.fill_curso_data)
+
+        # Fill the 'cmbx_num_Inscripcion' combobox with data
+        inscripciones = self.get_all_from_table("Inscritos", "No_Inscripcion", group="No_Inscripcion", order="No_Inscripcion ASC")
+        self.num_Inscripcion["values"] = [inscripcion[0] for inscripcion in inscripciones]
+        # Prevent from typing a value
+        self.num_Inscripcion['state'] = 'readonly'
+        self.num_Inscripcion.bind("<<ComboboxSelected>>", self.fill_inscritos)
         
+    def nueva_Inscripcion(self):
+        """
+        This function is triggered when the 'Nueva Inscripción' button is clicked.
+        It clears the entries and comboboxes to allow the user to create a new registration.
+        """
+        self.num_Inscripcion.set(self.get_next_inscripcion())
+        self.tView.delete(*self.tView.get_children())
     
     def run(self):
         self.mainwindow.mainloop()
@@ -266,7 +294,7 @@ class Inscripciones:
             logger.error("Error executing SQLite query: %s", e)
         return None
 
-    def get_all_from_table(self, table_name, fields: str = "*"):
+    def get_all_from_table(self, table_name, fields: str = "*", group: str = "", order: str = ""):
         """
         Retrieves all records from a specified table in the database.
 
@@ -278,6 +306,10 @@ class Inscripciones:
             list: A list of records retrieved from the table. Each record is represented as a tuple.
         """
         query = f"SELECT {fields} FROM {table_name}"
+        if group != "":
+            query += f" GROUP BY {group}"
+        if order != "":
+            query += f" ORDER BY {order}"
         result = self.execute_db_query(query)
         return result.fetchall() if result else []
     
@@ -298,6 +330,40 @@ class Inscripciones:
         query = f"SELECT {fields} FROM {table_name} WHERE {where[0]} = ?"
         result = self.execute_db_query(query, (where[1],))
         return result.fetchone() if result else []
+    
+    def get_data_from_inscritos(self, num_inscripcion: int):
+        # Get data from tabla Inscritos. Fields: No_Inscripcion, Codigo_Curso, Id_Alumno, Descrip_Curso, Horario
+        query = """
+        SELECT i.No_Inscripcion, i.Id_Alumno, i.Fecha_Inscripcion, i.Codigo_Curso, c.Descrip_Curso, i.Horario 
+        FROM Inscritos i 
+        JOIN Cursos c ON i.Codigo_Curso = c.Codigo_Curso 
+        WHERE i.No_Inscripcion = ?
+        """	
+        # Execute the query and get object instances from the result
+        result = self.execute_db_query(query, (num_inscripcion,))
+        return [Inscritos(*record) for record in result.fetchall()] if result else []
+
+    def get_next_inscripcion(self):
+        """
+        Retrieves the next available 'No_Inscripcion' value from the 'Inscritos' table.
+
+        Returns:
+            int: The next available 'No_Inscripcion' value.
+        """
+        query = "SELECT MAX(No_Inscripcion) FROM Inscritos"
+        result = self.execute_db_query(query)
+        return result.fetchone()[0] + 1 if result else 1
+
+class Inscritos:
+    table_Name = "Inscritos"
+    def __init__(self, num_inscripcion: int, id_alumno: str, fecha: datetime, codigo_curso: str, desc_curso:str, horario: str):
+        self.num_inscripcion = num_inscripcion
+        self.id_alumno = id_alumno
+        self.fecha = fecha
+        self.codigo_curso = codigo_curso
+        self.desc_curso = desc_curso
+        self.horario = horario
+        
 
 if __name__ == "__main__":
     app = Inscripciones()
