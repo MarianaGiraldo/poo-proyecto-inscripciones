@@ -119,7 +119,7 @@ class Inscripciones:
             if letras ==5:self.fecha.insert(6,"/")
         else:
             return "break"
-    def fecha_Valida(self):
+    def fecha_Valida(self, _):
         while True:
             try:
                 dia,mes,anio=map(int,self.fecha.get().split("/"))
