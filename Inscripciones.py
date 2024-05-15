@@ -155,7 +155,7 @@ class Inscripciones:
         btn.place(anchor="nw", x=x, y=y)
         return btn
     
-    def crear_Inscripcion(self):
+    def crear_Inscripcion(self, num_inscripcion, codigo_curso,id_alumno, descrip_Curso, horario):
         num_inscripcion = self.num_Inscripcion.get()
         id_alumno = self.cmbx_Id_Alumno.get()
         codigo_curso = self.cmbx_Id_Curso.get()
