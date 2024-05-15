@@ -127,6 +127,7 @@ class Inscripciones:
             try:
                 dia,mes,anio=map(int,self.fecha.get().split("/"))
                 datetime(anio,mes,dia)
+                break
                 
             except ValueError:
                 mssg.showerror("Error fecha equivocada")
@@ -166,7 +167,7 @@ class Inscripciones:
         params = (num_inscripcion, codigo_curso, id_alumno, descrip_Curso, horario)
 
         self.execute_db_query(query, params)
-        self.fill_inscritos()  # Actualiza la vista del treeview
+        self.fill_inscritos(None)  # Actualiza la vista del treeview
 
     def leer_Inscripcion(self, num_inscripcion):
         query = "SELECT * FROM Inscritos WHERE No_Inscripcion = ?"
@@ -177,12 +178,12 @@ class Inscripciones:
         query = "UPDATE Inscritos SET Codigo_Curso = ?, Id_Alumno = ?, Descrip_Curso = ?, Horario = ? WHERE No_Inscripcion = ?"
         params = (num_inscripcion, codigo_curso, id_alumno, descrip_Curso, horario )
         self.execute_db_query(query, params)
-        self.fill_inscritos()  # Actualiza la vista del treeview
+        self.fill_inscritos(None)  # Actualiza la vista del treeview
 
     def eliminar_Inscripcion(self, num_inscripcion):
         query = "DELETE FROM Inscritos WHERE No_Inscripcion = ?"
         self.execute_db_query(query, (num_inscripcion,))
-        self.fill_inscritos()  # Actualiza la vista del treeview
+        self.fill_inscritos(None)  # Actualiza la vista del treeview
 
     def create_treeview(self, frm_1):
         tView = ttk.Treeview(frm_1, name="tview")
