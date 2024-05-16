@@ -61,6 +61,7 @@ class Inscripciones:
         win.geometry("800x600")
        
         win.resizable(False, False)
+        win.iconbitmap("icon.ico")
         win.title("Inscripciones de Materias y Cursos")
         return win
 
@@ -156,20 +157,31 @@ class Inscripciones:
     def create_buttons(self, frm_1):
         # Botón de nueva inscripción
         self.btnNuevaInscripcion = self.create_button(frm_1, "btnnuevainscripcion", 'Nueva Inscripción', x=570, y=42, command=self.nueva_Inscripcion)
+        #Botón Consultar
+        self.btnConsultar = self.create_button(frm_1, "btnconsultar", 'Consultar', x=100, y=260,command=self.consultar_Inscripcion)
         #Botón Guardar
-        self.btnGuardar = self.create_button(frm_1, "btnguardar", 'Guardar', x=200, y=260,command=self.crear_Inscripcion)
+        self.btnGuardar = self.create_button(frm_1, "btnguardar", 'Guardar', x=225, y=260,command=self.crear_Inscripcion)
         #Botón Editar
-        self.btnEditar = self.create_button(frm_1, "btneditar", 'Editar', x=300, y=260,command=self.actualizar_Inscripcion)
+        self.btnEditar = self.create_button(frm_1, "btneditar", 'Editar', x=350, y=260,command=self.actualizar_Inscripcion)
         #Botón Eliminar
-        self.btnEliminar = self.create_button(frm_1, "btneliminar", 'Eliminar', x=400, y=260,command=self.elimina_Inscripcion)
+        self.btnEliminar = self.create_button(frm_1, "btneliminar", 'Eliminar', x=475, y=260,command=self.eliminar_Inscripcion)
         #Botón Cancelar
-        self.btnCancelar = self.create_button(frm_1, "btncancelar", 'Cancelar', x=500, y=260)   
+        self.btnCancelar = self.create_button(frm_1, "btncancelar", 'Cancelar', x=600, y=260)   
      
     def create_button(self, parent, name, text, x, y, command = (lambda: None)):
         btn = ttk.Button(parent, name=name, text=text, command=command)
         btn.place(anchor="nw", x=x, y=y)
         return btn
-    
+    def consultar_Inscripcion(self):
+        num_inscripcion = self.num_Inscripcion.get()
+        result = self.leer_Inscripcion(num_inscripcion)
+        if len(result) > 0:
+           self.cmbx_Id_Alumno.set(result[0][1])  
+           self.fecha.delete(0, tk.END)
+           self.fecha.insert(0, result[0][2])
+           self.fill_inscritos(None)
+        else:
+           mssg.showinfo("Inscripción no encontrada", f"No se encontró una inscripción con el número: {num_inscripcion}")
     def crear_Inscripcion(self):
         num_inscripcion = self.num_Inscripcion.get()
         id_alumno = self.cmbx_Id_Alumno.get()
@@ -200,7 +212,7 @@ class Inscripciones:
         self.execute_db_query(query, params)
         self.fill_inscritos(None)  # Actualiza la vista del treeview
 
-    def elimina_Inscripcion(self):
+    def eliminar_Inscripcion(self):
         self.op= tk.StringVar()
         self.opcion_Eliminar()
         self.eliminar()
