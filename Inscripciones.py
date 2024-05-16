@@ -13,10 +13,23 @@ logger = logging.getLogger(__name__)
 PATH = str((Path(__file__).resolve()).parent)
 DB_PATH = f"{PATH}/db/Inscripciones.db"
 class Inscripciones:
-    def __init__(self, master=None):\
+    def __init__(self, master=None):
         # Ventana principal
         self.db_name = DB_PATH
         self.win = self.create_main_window(master)
+        win_width = 800
+        win_height = 600
+        
+        # Obtener la resolución de la pantalla
+        screen_width = self.win.winfo_screenwidth()
+        screen_height = self.win.winfo_screenheight()
+        
+        # Calcular las coordenadas x e y para centrar la ventana
+        x = (screen_width - win_width) // 2
+        y = (screen_height - win_height) // 2
+        
+        # Establecer la geometría de la ventana
+        self.win.geometry(f'{win_width}x{win_height}+{x}+{y}')
 
         # Crea los frames
         self.frm_1 = self.create_frame(self.win)
@@ -46,6 +59,7 @@ class Inscripciones:
         win = tk.Tk(master)
         win.configure(background="#f7f9fd", height=600, width=800)
         win.geometry("800x600")
+       
         win.resizable(False, False)
         win.title("Inscripciones de Materias y Cursos")
         return win
@@ -147,7 +161,7 @@ class Inscripciones:
         #Botón Editar
         self.btnEditar = self.create_button(frm_1, "btneditar", 'Editar', x=300, y=260,command=self.actualizar_Inscripcion)
         #Botón Eliminar
-        self.btnEliminar = self.create_button(frm_1, "btneliminar", 'Eliminar', x=400, y=260,command=self.eliminar_Inscripcion)
+        self.btnEliminar = self.create_button(frm_1, "btneliminar", 'Eliminar', x=400, y=260,command=self.elimina_Inscripcion)
         #Botón Cancelar
         self.btnCancelar = self.create_button(frm_1, "btncancelar", 'Cancelar', x=500, y=260)   
      
@@ -160,7 +174,6 @@ class Inscripciones:
         num_inscripcion = self.num_Inscripcion.get()
         id_alumno = self.cmbx_Id_Alumno.get()
         codigo_curso = self.cmbx_Id_Curso.get()
-        #descrip_Curso=self.descripc_Curso.get()
         horario = self.horario.get()
         fecha_Inscripcion=self.fecha.get()
 
@@ -180,7 +193,6 @@ class Inscripciones:
         num_inscripcion = self.num_Inscripcion.get()
         id_alumno = self.cmbx_Id_Alumno.get()
         codigo_curso = self.cmbx_Id_Curso.get()
-        #descrip_Curso=self.descripc_Curso.get()
         horario = self.horario.get()
         fecha_Inscripcion=self.fecha.get()
         query = "UPDATE Inscritos SET Horario = ?, Fecha_Inscripcion = ? WHERE No_Inscripcion = ? AND Id_Alumno=? AND Codigo_Curso=?"
@@ -188,17 +200,60 @@ class Inscripciones:
         self.execute_db_query(query, params)
         self.fill_inscritos(None)  # Actualiza la vista del treeview
 
-    def eliminar_Inscripcion(self):
-        num_inscripcion = self.num_Inscripcion.get()
-        id_alumno = self.cmbx_Id_Alumno.get()
-        codigo_curso = self.cmbx_Id_Curso.get()
-        #descrip_Curso=self.descripc_Curso.get()
-        horario = self.horario.get()
-        fecha_Inscripcion=self.fecha.get()
-        query = "DELETE FROM Inscritos WHERE No_Inscripcion = ? AND Id_Alumno=? AND Codigo_Curso=? AND Horario=? AND Fecha_Inscripcion=?"
-        params = ( num_inscripcion,  id_alumno,codigo_curso,horario,fecha_Inscripcion )
-        self.execute_db_query(query, params)
-        self.fill_inscritos(None)  # Actualiza la vista del treeview
+    def elimina_Inscripcion(self):
+        self.op= tk.StringVar()
+        self.opcion_Eliminar()
+        self.eliminar()
+
+    def opcion_Eliminar(self):
+        self.new_win=tk.Toplevel(self.win)
+        self.new_win.title('Eliminar Datos')
+        new_win_width = 220
+        new_win_height = 180
+        # Obtener la resolución de la pantalla
+        screen_width = self.new_win.winfo_screenwidth()
+        screen_height = self.new_win.winfo_screenheight()
+        
+        # Calcular las coordenadas x e y para centrar la ventana
+        x = (screen_width - new_win_width) // 2
+        y = (screen_height - new_win_height) // 2
+            
+        # Establecer la geometría de la ventana
+        self.new_win.geometry(f'{new_win_width}x{new_win_height}+{x}+{y}')
+        self.frame=tk.Frame(self.new_win,borderwidth=2,relief="groove")
+        self.frame.pack(padx=10,pady=10)
+        self.var=tk.StringVar()
+        self.var.set(None)
+        self.r1=ttk.Radiobutton(self.frame,text="Eliminar uno",variable=self.var,value=1).pack(anchor='w')
+        self.r2=ttk.Radiobutton(self.frame,text="Eliminar todos",variable=self.var,value=2).pack(anchor='w')
+        ttk.Button(self.new_win, text="Aceptar", command=self.eliminar).pack() 
+        ttk.Button(self.new_win, text="Cancelar", command=self.new_win.destroy).pack()
+
+    def eliminar(self):
+        eleccion=self.var.get()
+        if eleccion is not None:
+            if eleccion=='1':
+                try:
+                    num_inscripcion = self.num_Inscripcion.get()
+                    id_alumno = self.cmbx_Id_Alumno.get()
+                    codigo_curso = self.cmbx_Id_Curso.get()
+                    horario = self.horario.get()
+                    fecha_Inscripcion=self.fecha.get()
+                    query="DELETE FROM Inscritos WHERE No_Inscripcion = ? AND Id_Alumno=? AND Codigo_Curso=? AND Horario=? AND Fecha_Inscripcion=?"
+                    params = ( num_inscripcion,  id_alumno,codigo_curso,horario,fecha_Inscripcion )
+                    self.execute_db_query(query, params)
+                    self.fill_inscritos(None)  # Actualiza la vista del treeview
+                except IndexError:
+                    mssg.showerror("Error")
+            elif eleccion=='2':
+                try:
+                    num_inscripcion = self.num_Inscripcion.get()
+                    query = "DELETE FROM Inscritos WHERE No_Inscripcion = ? "
+                    self.execute_db_query(query, (num_inscripcion,))
+                    self.fill_inscritos(None)  # Actualiza la vista del treeview
+                except IndexError:
+                    mssg.showerror("Error")
+                self.new_win.destroy()
 
     def create_treeview(self, frm_1):
         tView = ttk.Treeview(frm_1, name="tview")
