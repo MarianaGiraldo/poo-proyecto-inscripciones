@@ -147,10 +147,10 @@ class Inscripciones:
         #Botón Editar
         self.btnEditar = self.create_button(frm_1, "btneditar", 'Editar', x=300, y=260,command=self.actualizar_Inscripcion)
         #Botón Eliminar
-        self.btnEliminar = self.create_button(frm_1, "btneliminar", 'Eliminar', x=400, y=260,command=lambda:self.eliminar_Inscripcion(self.num_Inscripcion.get()))
+        self.btnEliminar = self.create_button(frm_1, "btneliminar", 'Eliminar', x=400, y=260,command=self.eliminar_Inscripcion)
         #Botón Cancelar
-        self.btnCancelar = self.create_button(frm_1, "btncancelar", 'Cancelar', x=500, y=260)
-
+        self.btnCancelar = self.create_button(frm_1, "btncancelar", 'Cancelar', x=500, y=260)   
+     
     def create_button(self, parent, name, text, x, y, command = (lambda: None)):
         btn = ttk.Button(parent, name=name, text=text, command=command)
         btn.place(anchor="nw", x=x, y=y)
@@ -175,15 +175,29 @@ class Inscripciones:
         result = self.execute_db_query(query, (num_inscripcion,))
         return result.fetchall()
 
-    def actualizar_Inscripcion(self, num_inscripcion, codigo_curso,id_alumno, horario):
-        query = "UPDATE Inscritos SET Codigo_Curso = ?, Id_Alumno = ?, Horario = ? WHERE No_Inscripcion = ?"
-        params = (num_inscripcion, codigo_curso, id_alumno, horario )
+    def actualizar_Inscripcion(self):
+        
+        num_inscripcion = self.num_Inscripcion.get()
+        id_alumno = self.cmbx_Id_Alumno.get()
+        codigo_curso = self.cmbx_Id_Curso.get()
+        #descrip_Curso=self.descripc_Curso.get()
+        horario = self.horario.get()
+        fecha_Inscripcion=self.fecha.get()
+        query = "UPDATE Inscritos SET Horario = ?, Fecha_Inscripcion = ? WHERE No_Inscripcion = ? AND Id_Alumno=? AND Codigo_Curso=?"
+        params = ( horario,fecha_Inscripcion,num_inscripcion,  id_alumno,codigo_curso )
         self.execute_db_query(query, params)
         self.fill_inscritos(None)  # Actualiza la vista del treeview
 
-    def eliminar_Inscripcion(self, num_inscripcion):
-        query = "DELETE FROM Inscritos WHERE No_Inscripcion = ?"
-        self.execute_db_query(query, (num_inscripcion,))
+    def eliminar_Inscripcion(self):
+        num_inscripcion = self.num_Inscripcion.get()
+        id_alumno = self.cmbx_Id_Alumno.get()
+        codigo_curso = self.cmbx_Id_Curso.get()
+        #descrip_Curso=self.descripc_Curso.get()
+        horario = self.horario.get()
+        fecha_Inscripcion=self.fecha.get()
+        query = "DELETE FROM Inscritos WHERE No_Inscripcion = ? AND Id_Alumno=? AND Codigo_Curso=? AND Horario=? AND Fecha_Inscripcion=?"
+        params = ( num_inscripcion,  id_alumno,codigo_curso,horario,fecha_Inscripcion )
+        self.execute_db_query(query, params)
         self.fill_inscritos(None)  # Actualiza la vista del treeview
 
     def create_treeview(self, frm_1):
