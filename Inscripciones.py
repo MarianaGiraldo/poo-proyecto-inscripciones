@@ -166,25 +166,12 @@ class Inscripciones:
         #Botón Eliminar
         self.btnEliminar = self.create_button(frm_1, "btneliminar", 'Eliminar', x=475, y=260,command=self.eliminar_Inscripcion)
         #Botón Cancelar
-        self.btnCancelar = self.create_button(frm_1, "btncancelar", 'Cancelar', x=600, y=260, command=self.cancel_operation)   
+        self.btnCancelar = self.create_button(frm_1, "btncancelar", 'Cancelar', x=600, y=260)   
      
     def create_button(self, parent, name, text, x, y, command = (lambda: None)):
         btn = ttk.Button(parent, name=name, text=text, command=command)
         btn.place(anchor="nw", x=x, y=y)
         return btn
-    
-    
-    def cancel_operation(self):
-        # bool_do_dates almacena la respuesta booleana de la existencia de datos en alguno de los Entry 
-        bool_do_dates = (self.fecha.get() != "") | (self.nombres.get() != "") | (self.apellidos.get() != "") | (self.cmbx_Id_Curso.get() != "") | (self.descripc_Curso.get() != "") | (self.horario.get() != "") | (self.num_Inscripcion.get() != "")
-        if  bool_do_dates:
-            self.create_entries(self.frm_1)
-            self.fill_cmboxes()
-            self.tView = self.create_treeview(self.frm_1)   
-            mssg.showinfo("Cancelar operacion", "Operacion(es) cancelada(s)")
-        else:
-            mssg.showerror("Cancelar operacion", "No hay operaciones para cancelar")
-        
     def consultar_Inscripcion(self):
         num_inscripcion = self.num_Inscripcion.get()
         result = self.leer_Inscripcion(num_inscripcion)
@@ -195,6 +182,7 @@ class Inscripciones:
            self.fill_inscritos(None)
         else:
            mssg.showinfo("Inscripción no encontrada", f"No se encontró una inscripción con el número: {num_inscripcion}")
+           
     def crear_Inscripcion(self):
         num_inscripcion = self.num_Inscripcion.get()
         id_alumno = self.cmbx_Id_Alumno.get()
