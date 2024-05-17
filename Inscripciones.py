@@ -154,6 +154,8 @@ class Inscripciones:
     def create_combobox(self, parent, name, width, x, y):
         cmbx = ttk.Combobox(parent, name=name)
         cmbx.place(anchor="nw", width=width, x=x, y=y)
+        # Prevent from typing a value
+        cmbx['state'] = 'readonly'
         return cmbx
 
     def create_buttons(self, frm_1):
@@ -258,25 +260,51 @@ class Inscripciones:
         # Fill the 'cmbx_Id_Alumno' combobox with data
         alumnos = self.get_all_from_table("Alumnos", "Id_Alumno")
         self.cmbx_Id_Alumno["values"] = [alumno[0] for alumno in alumnos]
-        # prevent typing a value
-        self.cmbx_Id_Alumno['state'] = 'readonly'
         # Bind the '<<ComboboxSelected>>' event to the 'fill_alumno_data' function
         self.cmbx_Id_Alumno.bind("<<ComboboxSelected>>", self.fill_alumno_data)
 
         # Fill the 'cmbx_Id_Curso' combobox with data
         cursos = self.get_all_from_table("Cursos", "Codigo_Curso")
         self.cmbx_Id_Curso["values"] = [curso[0] for curso in cursos]
-        # Prevent from typing a value
-        self.cmbx_Id_Curso['state'] = 'readonly'
         # Bind the '<<ComboboxSelected>>' event to the 'fill_curso_data' function
         self.cmbx_Id_Curso.bind("<<ComboboxSelected>>", self.fill_curso_data)
 
         # Fill the 'cmbx_num_Inscripcion' combobox with data
         inscripciones = self.get_all_from_table("Inscritos", "No_Inscripcion", group="No_Inscripcion", order="No_Inscripcion ASC")
         self.num_Inscripcion["values"] = [inscripcion[0] for inscripcion in inscripciones]
-        # Prevent from typing a value
-        self.num_Inscripcion['state'] = 'readonly'
         self.num_Inscripcion.bind("<<ComboboxSelected>>", self.fill_inscritos)
+
+        horas_del_dia = ["01:00", "02:00", "03:00", "04:00", "05:00", "06:00", "07:00", "08:00", "09:00", "10:00", "11:00", "12:00"]
+        am_pm = ["AM", "PM"]
+        self.horario_desde["values"] = horas_del_dia
+        self.horario_hasta["values"] = horas_del_dia
+        self.horario_desde_am["values"] = am_pm
+        self.horario_hasta_am["values"] = am_pm
+        self.horario_desde.bind("<<ComboboxSelected>>", self.validate_Horario)
+        self.horario_hasta.bind("<<ComboboxSelected>>", self.validate_Horario)
+        self.horario_desde_am.bind("<<ComboboxSelected>>", self.validate_Horario)
+        self.horario_hasta_am.bind("<<ComboboxSelected>>", self.validate_Horario)
+
+    def validate_Horario(self, _):
+        """
+        This function validates the 'horario' field to ensure that the 'horario_desde' value is less than the 'horario_hasta' value.
+        """
+        if self.horario_desde.get() != "" and self.horario_desde_am.get() != "" and self.horario_hasta.get() != "" and self.horario_hasta_am.get() != "":
+            if self.horario_desde_am.get() == self.horario_hasta_am.get() != "" and self.horario_desde.get() >= self.horario_hasta.get():
+                mssg.showerror("Error", "La hora de inicio debe ser menor que la hora de finalización")
+                return False
+            if self.horario_desde_am.get() == "PM" and self.horario_hasta_am.get() == "AM":
+                mssg.showerror("Error", "La hora de inicio debe ser menor que la hora de finalización")
+                return False
+        return True
+
+    def get_Horario(self):
+        """
+        This function retrieves the 'horario' value from the 'horario_desde' and 'horario_hasta' comboboxes.
+        """
+        horario_desde = self.horario_desde.get() + " " + self.horario_desde_am.get()
+        horario_hasta = self.horario_hasta.get() + " " + self.horario_hasta_am.get()
+        return f"{horario_desde} - {horario_hasta}"
 
     def nueva_Inscripcion(self):
         """
@@ -288,8 +316,9 @@ class Inscripciones:
 
     def cancel_operation(self):
         # bool_do_dates almacena la respuesta booleana de la existencia de datos en alguno de los Entry
-        bool_do_dates = (self.fecha.get() != "") | (self.nombres.get() != "") | (self.apellidos.get() != "") | (self.cmbx_Id_Curso.get() != "") | (self.descripc_Curso.get() != "") | (self.horario.get() != "") | (self.num_Inscripcion.get() != "")
-        if  bool_do_dates:
+        hasData = (self.fecha.get() != "") | (self.nombres.get() != "") | (self.apellidos.get() != "") | (
+            self.cmbx_Id_Curso.get() != "") | (self.descripc_Curso.get() != "") | (self.get_Horario() != "") | (self.num_Inscripcion.get() != "")
+        if  hasData:
             self.create_entries(self.frm_1)
             self.fill_cmboxes()
             self.tView = self.create_treeview(self.frm_1)
@@ -298,7 +327,7 @@ class Inscripciones:
             mssg.showerror("Cancelar operacion", "No hay operacion(es) para cancelar")
 
     def desactivar_Campos(self):
-                # Disable all entry fields
+        # Disable all entry fields
         self.num_Inscripcion.config(state="disabled")
         self.cmbx_Id_Alumno.config(state="disabled")
         self.nombres.config(state="disabled")
@@ -318,35 +347,6 @@ class Inscripciones:
         else:
             mssg.showinfo("Inscripción no encontrada", f"No se encontró una inscripción con el número: {num_inscripcion}")
 
-    def crear_Inscripcion(self):
-        num_inscripcion = self.num_Inscripcion.get()
-        id_alumno = self.cmbx_Id_Alumno.get()
-        codigo_curso = self.cmbx_Id_Curso.get()
-        horario = self.horario.get()
-        fecha_Inscripcion =self.fecha.get()
-
-        query = "INSERT INTO Inscritos (No_Inscripcion, Codigo_Curso, Id_Alumno, Horario, Fecha_Inscripcion) VALUES (?, ?, ?, ?, ?)"
-        params = (num_inscripcion, codigo_curso, id_alumno, horario, fecha_Inscripcion)
-
-        self.execute_db_query(query, params)
-        self.fill_inscritos(None)  # Actualiza la vista del treeview
-
-    def leer_Inscripcion(self, num_inscripcion):
-        query = "SELECT * FROM Inscritos WHERE No_Inscripcion = ? "
-        result = self.execute_db_query(query, (num_inscripcion,))
-        return result.fetchall()
-
-    def actualizar_Inscripcion(self):
-
-        num_inscripcion = self.num_Inscripcion.get()
-        id_alumno = self.cmbx_Id_Alumno.get()
-        codigo_curso = self.cmbx_Id_Curso.get()
-        horario = self.horario.get()
-        fecha_Inscripcion=self.fecha.get()
-        query = "UPDATE Inscritos SET Horario = ?, Fecha_Inscripcion = ? WHERE No_Inscripcion = ? AND Id_Alumno=? AND Codigo_Curso=?"
-        params = ( horario,fecha_Inscripcion,num_inscripcion,  id_alumno,codigo_curso )
-        self.execute_db_query(query, params)
-        self.fill_inscritos(None)  # Actualiza la vista del treeview
 
     def eliminar_Inscripcion(self):
         self.op= tk.StringVar()
@@ -377,29 +377,6 @@ class Inscripciones:
         ttk.Button(self.new_win, text="Aceptar", command=self.eliminar).pack()
         ttk.Button(self.new_win, text="Cancelar", command=self.new_win.destroy).pack()
 
-    def eliminar(self):
-        eleccion=self.var.get()
-        if eleccion is not None:
-            if eleccion=='1':
-                try:
-                    num_inscripcion = self.num_Inscripcion.get()
-                    id_alumno = self.cmbx_Id_Alumno.get()
-                    codigo_curso = self.cmbx_Id_Curso.get()
-                    query = "DELETE FROM Inscritos WHERE No_Inscripcion = ? AND Id_Alumno=? AND Codigo_Curso=?"
-                    params = (num_inscripcion, id_alumno, codigo_curso)
-                    self.execute_db_query(query, params)
-                    self.fill_inscritos(None)  # Actualiza la vista del treeview
-                except IndexError:
-                    mssg.showerror("Error")
-            elif eleccion=='2':
-                try:
-                    num_inscripcion = self.num_Inscripcion.get()
-                    query = "DELETE FROM Inscritos WHERE No_Inscripcion = ? "
-                    self.execute_db_query(query, (num_inscripcion,))
-                    self.fill_inscritos(None)  # Actualiza la vista del treeview
-                except IndexError:
-                    mssg.showerror("Error")
-                self.new_win.destroy()
 
     def run(self):
         self.mainwindow.mainloop()
@@ -489,6 +466,63 @@ class Inscripciones:
         query = "SELECT MAX(No_Inscripcion) FROM Inscritos"
         result = self.execute_db_query(query)
         return result.fetchone()[0] + 1 if result else 1
+    def eliminar(self):
+        eleccion=self.var.get()
+        if eleccion is not None:
+            if eleccion=='1':
+                try:
+                    num_inscripcion = self.num_Inscripcion.get()
+                    id_alumno = self.cmbx_Id_Alumno.get()
+                    codigo_curso = self.cmbx_Id_Curso.get()
+                    query = "DELETE FROM Inscritos WHERE No_Inscripcion = ? AND Id_Alumno=? AND Codigo_Curso=?"
+                    params = (num_inscripcion, id_alumno, codigo_curso)
+                    self.execute_db_query(query, params)
+                    self.fill_inscritos(None)  # Actualiza la vista del treeview
+                except IndexError:
+                    mssg.showerror("Error")
+            elif eleccion=='2':
+                try:
+                    num_inscripcion = self.num_Inscripcion.get()
+                    query = "DELETE FROM Inscritos WHERE No_Inscripcion = ? "
+                    self.execute_db_query(query, (num_inscripcion,))
+                    self.fill_inscritos(None)  # Actualiza la vista del treeview
+                except IndexError:
+                    mssg.showerror("Error")
+                self.new_win.destroy()
+
+    def crear_Inscripcion(self):
+        num_inscripcion = self.num_Inscripcion.get()
+        id_alumno = self.cmbx_Id_Alumno.get()
+        codigo_curso = self.cmbx_Id_Curso.get()
+        horario = self.get_Horario()
+        fecha_Inscripcion =self.fecha.get()
+
+        query = "INSERT INTO Inscritos (No_Inscripcion, Codigo_Curso, Id_Alumno, Horario, Fecha_Inscripcion) VALUES (?, ?, ?, ?, ?)"
+        params = (num_inscripcion, codigo_curso, id_alumno, horario, fecha_Inscripcion)
+        if self.validate_Horario(None):
+            result = self.execute_db_query(query, params)
+            if result:
+                mssg.showinfo("Inscripción creada", "La inscripción se ha creado exitosamente")
+                self.fill_inscritos(None) # Actualiza la vista del treeview
+
+    def leer_Inscripcion(self, num_inscripcion):
+        query = "SELECT * FROM Inscritos WHERE No_Inscripcion = ? "
+        result = self.execute_db_query(query, (num_inscripcion,))
+        return result.fetchall()
+
+    def actualizar_Inscripcion(self):
+        num_inscripcion = self.num_Inscripcion.get()
+        id_alumno = self.cmbx_Id_Alumno.get()
+        codigo_curso = self.cmbx_Id_Curso.get()
+        horario = self.get_Horario()
+        fecha_Inscripcion=self.fecha.get()
+        query = "UPDATE Inscritos SET Horario = ?, Fecha_Inscripcion = ? WHERE No_Inscripcion = ? AND Id_Alumno=? AND Codigo_Curso=?"
+        params = ( horario,fecha_Inscripcion,num_inscripcion,  id_alumno,codigo_curso )
+        if self.validate_Horario(None):
+            result = self.execute_db_query(query, params)
+            if result:
+                mssg.showinfo("Inscripción actualizada", "La inscripción se ha actualizado exitosamente")
+                self.fill_inscritos(None)  # Actualiza la vista del treeview
 
 # class Inscritos:
 #     table_Name = "Inscritos"
