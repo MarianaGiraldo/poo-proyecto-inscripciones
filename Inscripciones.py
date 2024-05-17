@@ -164,7 +164,7 @@ class Inscripciones:
         #Botón Eliminar
         self.btnEliminar = self.create_button(frm_1, "btneliminar", 'Eliminar', x=475, y=260,command=self.eliminar_Inscripcion)
         #Botón Cancelar
-        self.btnCancelar = self.create_button(frm_1, "btncancelar", 'Cancelar', x=600, y=260, command=self.cancel_operation)
+        self.btnCancelar = self.create_button(frm_1, "btncancelar", 'Cancelar', x=600, y=260,command=self.cancel_operation)
 
     def create_button(self, parent, name, text, x, y, command = (lambda: None)):
         btn = ttk.Button(parent, name=name, text=text, command=command)
@@ -181,6 +181,15 @@ class Inscripciones:
             mssg.showinfo("Cancelar operacion", "Operacion(es) cancelada(s)")
         else:
             mssg.showerror("Cancelar operacion", "No hay operacion(es) para cancelar")
+            
+    def desactivar_Campos(self):
+                # Disable all entry fields
+        self.num_Inscripcion.config(state="disabled")
+        self.cmbx_Id_Alumno.config(state="disabled")
+        self.nombres.config(state="disabled")
+        self.apellidos.config(state="disabled")
+        self.cmbx_Id_Curso.config(state="disabled")
+        self.descripc_Curso.config(state="disabled")
 
     def consultar_Inscripcion(self):
         num_inscripcion = self.num_Inscripcion.get()
@@ -190,6 +199,7 @@ class Inscripciones:
             self.fecha.delete(0, tk.END)
             self.fecha.insert(0, result[0][2])
             self.fill_inscritos(None)
+            self.desactivar_Campos()
         else:
             mssg.showinfo("Inscripción no encontrada", f"No se encontró una inscripción con el número: {num_inscripcion}")
 
@@ -207,7 +217,7 @@ class Inscripciones:
         self.fill_inscritos(None)  # Actualiza la vista del treeview
 
     def leer_Inscripcion(self, num_inscripcion):
-        query = "SELECT * FROM Inscritos WHERE No_Inscripcion = ?"
+        query = "SELECT * FROM Inscritos WHERE No_Inscripcion = ? "
         result = self.execute_db_query(query, (num_inscripcion,))
         return result.fetchall()
 
