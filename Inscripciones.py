@@ -174,121 +174,6 @@ class Inscripciones:
         btn = ttk.Button(parent, name=name, text=text, command=command)
         btn.place(anchor="nw", x=x, y=y)
         return btn
-    
-    def cancel_operation(self):
-        # bool_do_dates almacena la respuesta booleana de la existencia de datos en alguno de los Entry 
-        bool_do_dates = (self.fecha.get() != "") | (self.nombres.get() != "") | (self.apellidos.get() != "") | (self.cmbx_Id_Curso.get() != "") | (self.descripc_Curso.get() != "") | (self.horario.get() != "") | (self.num_Inscripcion.get() != "")
-        if  bool_do_dates:
-            self.create_entries(self.frm_1)
-            self.fill_cmboxes()
-            self.tView = self.create_treeview(self.frm_1)   
-            mssg.showinfo("Cancelar operacion", "Operacion(es) cancelada(s)")
-        else:
-            mssg.showerror("Cancelar operacion", "No hay operacion(es) para cancelar")
-            
-    def desactivar_Campos(self):
-                # Disable all entry fields
-        self.num_Inscripcion.config(state="disabled")
-        self.cmbx_Id_Alumno.config(state="disabled")
-        self.nombres.config(state="disabled")
-        self.apellidos.config(state="disabled")
-        self.cmbx_Id_Curso.config(state="disabled")
-        self.descripc_Curso.config(state="disabled")
-
-    def consultar_Inscripcion(self):
-        num_inscripcion = self.num_Inscripcion.get()
-        result = self.leer_Inscripcion(num_inscripcion)
-        if len(result) > 0:
-            self.cmbx_Id_Alumno.set(result[0][1])
-            self.fecha.delete(0, tk.END)
-            self.fecha.insert(0, result[0][2])
-            self.fill_inscritos(None)
-            self.desactivar_Campos()
-        else:
-            mssg.showinfo("Inscripción no encontrada", f"No se encontró una inscripción con el número: {num_inscripcion}")
-
-    def crear_Inscripcion(self):
-        num_inscripcion = self.num_Inscripcion.get()
-        id_alumno = self.cmbx_Id_Alumno.get()
-        codigo_curso = self.cmbx_Id_Curso.get()
-        horario = self.horario.get()
-        fecha_Inscripcion =self.fecha.get()
-
-        query = "INSERT INTO Inscritos (No_Inscripcion, Codigo_Curso, Id_Alumno, Horario, Fecha_Inscripcion) VALUES (?, ?, ?, ?, ?)"
-        params = (num_inscripcion, codigo_curso, id_alumno, horario, fecha_Inscripcion)
-
-        self.execute_db_query(query, params)
-        self.fill_inscritos(None)  # Actualiza la vista del treeview
-
-    def leer_Inscripcion(self, num_inscripcion):
-        query = "SELECT * FROM Inscritos WHERE No_Inscripcion = ? "
-        result = self.execute_db_query(query, (num_inscripcion,))
-        return result.fetchall()
-
-    def actualizar_Inscripcion(self):
-
-        num_inscripcion = self.num_Inscripcion.get()
-        id_alumno = self.cmbx_Id_Alumno.get()
-        codigo_curso = self.cmbx_Id_Curso.get()
-        horario = self.horario.get()
-        fecha_Inscripcion=self.fecha.get()
-        query = "UPDATE Inscritos SET Horario = ?, Fecha_Inscripcion = ? WHERE No_Inscripcion = ? AND Id_Alumno=? AND Codigo_Curso=?"
-        params = ( horario,fecha_Inscripcion,num_inscripcion,  id_alumno,codigo_curso )
-        self.execute_db_query(query, params)
-        self.fill_inscritos(None)  # Actualiza la vista del treeview
-
-    def eliminar_Inscripcion(self):
-        self.op= tk.StringVar()
-        self.opcion_Eliminar()
-        self.eliminar()
-
-    def opcion_Eliminar(self):
-        self.new_win=tk.Toplevel(self.win)
-        self.new_win.title('Eliminar Datos')
-        new_win_width = 220
-        new_win_height = 180
-        # Obtener la resolución de la pantalla
-        screen_width = self.new_win.winfo_screenwidth()
-        screen_height = self.new_win.winfo_screenheight()
-
-        # Calcular las coordenadas x e y para centrar la ventana
-        x = (screen_width - new_win_width) // 2
-        y = (screen_height - new_win_height) // 2
-
-        # Establecer la geometría de la ventana
-        self.new_win.geometry(f'{new_win_width}x{new_win_height}+{x}+{y}')
-        self.frame=tk.Frame(self.new_win,borderwidth=2,relief="groove")
-        self.frame.pack(padx=10,pady=10)
-        self.var=tk.StringVar()
-        self.var.set(None)
-        ttk.Radiobutton(self.frame,text="Eliminar uno",variable=self.var,value=1).pack(anchor='w')
-        ttk.Radiobutton(self.frame,text="Eliminar todos",variable=self.var,value=2).pack(anchor='w')
-        ttk.Button(self.new_win, text="Aceptar", command=self.eliminar).pack()
-        ttk.Button(self.new_win, text="Cancelar", command=self.new_win.destroy).pack()
-
-    def eliminar(self):
-        eleccion=self.var.get()
-        if eleccion is not None:
-            if eleccion=='1':
-                try:
-                    num_inscripcion = self.num_Inscripcion.get()
-                    id_alumno = self.cmbx_Id_Alumno.get()
-                    codigo_curso = self.cmbx_Id_Curso.get()
-                    query = "DELETE FROM Inscritos WHERE No_Inscripcion = ? AND Id_Alumno=? AND Codigo_Curso=?"
-                    params = (num_inscripcion, id_alumno, codigo_curso)
-                    self.execute_db_query(query, params)
-                    self.fill_inscritos(None)  # Actualiza la vista del treeview
-                except IndexError:
-                    mssg.showerror("Error")
-            elif eleccion=='2':
-                try:
-                    num_inscripcion = self.num_Inscripcion.get()
-                    query = "DELETE FROM Inscritos WHERE No_Inscripcion = ? "
-                    self.execute_db_query(query, (num_inscripcion,))
-                    self.fill_inscritos(None)  # Actualiza la vista del treeview
-                except IndexError:
-                    mssg.showerror("Error")
-                self.new_win.destroy()
 
     def create_treeview(self, frm_1):
         tView = ttk.Treeview(frm_1, name="tview")
@@ -400,6 +285,121 @@ class Inscripciones:
         """
         self.num_Inscripcion.set(self.get_next_inscripcion())
         self.tView.delete(*self.tView.get_children())
+
+    def cancel_operation(self):
+        # bool_do_dates almacena la respuesta booleana de la existencia de datos en alguno de los Entry
+        bool_do_dates = (self.fecha.get() != "") | (self.nombres.get() != "") | (self.apellidos.get() != "") | (self.cmbx_Id_Curso.get() != "") | (self.descripc_Curso.get() != "") | (self.horario.get() != "") | (self.num_Inscripcion.get() != "")
+        if  bool_do_dates:
+            self.create_entries(self.frm_1)
+            self.fill_cmboxes()
+            self.tView = self.create_treeview(self.frm_1)
+            mssg.showinfo("Cancelar operacion", "Operacion(es) cancelada(s)")
+        else:
+            mssg.showerror("Cancelar operacion", "No hay operacion(es) para cancelar")
+
+    def desactivar_Campos(self):
+                # Disable all entry fields
+        self.num_Inscripcion.config(state="disabled")
+        self.cmbx_Id_Alumno.config(state="disabled")
+        self.nombres.config(state="disabled")
+        self.apellidos.config(state="disabled")
+        self.cmbx_Id_Curso.config(state="disabled")
+        self.descripc_Curso.config(state="disabled")
+
+    def consultar_Inscripcion(self):
+        num_inscripcion = self.num_Inscripcion.get()
+        result = self.leer_Inscripcion(num_inscripcion)
+        if len(result) > 0:
+            self.cmbx_Id_Alumno.set(result[0][1])
+            self.fecha.delete(0, tk.END)
+            self.fecha.insert(0, result[0][2])
+            self.fill_inscritos(None)
+            self.desactivar_Campos()
+        else:
+            mssg.showinfo("Inscripción no encontrada", f"No se encontró una inscripción con el número: {num_inscripcion}")
+
+    def crear_Inscripcion(self):
+        num_inscripcion = self.num_Inscripcion.get()
+        id_alumno = self.cmbx_Id_Alumno.get()
+        codigo_curso = self.cmbx_Id_Curso.get()
+        horario = self.horario.get()
+        fecha_Inscripcion =self.fecha.get()
+
+        query = "INSERT INTO Inscritos (No_Inscripcion, Codigo_Curso, Id_Alumno, Horario, Fecha_Inscripcion) VALUES (?, ?, ?, ?, ?)"
+        params = (num_inscripcion, codigo_curso, id_alumno, horario, fecha_Inscripcion)
+
+        self.execute_db_query(query, params)
+        self.fill_inscritos(None)  # Actualiza la vista del treeview
+
+    def leer_Inscripcion(self, num_inscripcion):
+        query = "SELECT * FROM Inscritos WHERE No_Inscripcion = ? "
+        result = self.execute_db_query(query, (num_inscripcion,))
+        return result.fetchall()
+
+    def actualizar_Inscripcion(self):
+
+        num_inscripcion = self.num_Inscripcion.get()
+        id_alumno = self.cmbx_Id_Alumno.get()
+        codigo_curso = self.cmbx_Id_Curso.get()
+        horario = self.horario.get()
+        fecha_Inscripcion=self.fecha.get()
+        query = "UPDATE Inscritos SET Horario = ?, Fecha_Inscripcion = ? WHERE No_Inscripcion = ? AND Id_Alumno=? AND Codigo_Curso=?"
+        params = ( horario,fecha_Inscripcion,num_inscripcion,  id_alumno,codigo_curso )
+        self.execute_db_query(query, params)
+        self.fill_inscritos(None)  # Actualiza la vista del treeview
+
+    def eliminar_Inscripcion(self):
+        self.op= tk.StringVar()
+        self.opcion_Eliminar()
+        self.eliminar()
+
+    def opcion_Eliminar(self):
+        self.new_win=tk.Toplevel(self.win)
+        self.new_win.title('Eliminar Datos')
+        new_win_width = 220
+        new_win_height = 180
+        # Obtener la resolución de la pantalla
+        screen_width = self.new_win.winfo_screenwidth()
+        screen_height = self.new_win.winfo_screenheight()
+
+        # Calcular las coordenadas x e y para centrar la ventana
+        x = (screen_width - new_win_width) // 2
+        y = (screen_height - new_win_height) // 2
+
+        # Establecer la geometría de la ventana
+        self.new_win.geometry(f'{new_win_width}x{new_win_height}+{x}+{y}')
+        self.frame=tk.Frame(self.new_win,borderwidth=2,relief="groove")
+        self.frame.pack(padx=10,pady=10)
+        self.var=tk.StringVar()
+        self.var.set(None)
+        ttk.Radiobutton(self.frame,text="Eliminar uno",variable=self.var,value=1).pack(anchor='w')
+        ttk.Radiobutton(self.frame,text="Eliminar todos",variable=self.var,value=2).pack(anchor='w')
+        ttk.Button(self.new_win, text="Aceptar", command=self.eliminar).pack()
+        ttk.Button(self.new_win, text="Cancelar", command=self.new_win.destroy).pack()
+
+    def eliminar(self):
+        eleccion=self.var.get()
+        if eleccion is not None:
+            if eleccion=='1':
+                try:
+                    num_inscripcion = self.num_Inscripcion.get()
+                    id_alumno = self.cmbx_Id_Alumno.get()
+                    codigo_curso = self.cmbx_Id_Curso.get()
+                    query = "DELETE FROM Inscritos WHERE No_Inscripcion = ? AND Id_Alumno=? AND Codigo_Curso=?"
+                    params = (num_inscripcion, id_alumno, codigo_curso)
+                    self.execute_db_query(query, params)
+                    self.fill_inscritos(None)  # Actualiza la vista del treeview
+                except IndexError:
+                    mssg.showerror("Error")
+            elif eleccion=='2':
+                try:
+                    num_inscripcion = self.num_Inscripcion.get()
+                    query = "DELETE FROM Inscritos WHERE No_Inscripcion = ? "
+                    self.execute_db_query(query, (num_inscripcion,))
+                    self.fill_inscritos(None)  # Actualiza la vista del treeview
+                except IndexError:
+                    mssg.showerror("Error")
+                self.new_win.destroy()
 
     def run(self):
         self.mainwindow.mainloop()
