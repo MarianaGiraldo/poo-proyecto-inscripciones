@@ -116,3 +116,4 @@ class Inscripciones:
 if __name__ == "__main__":
     app = Inscripciones()
     app.run()
+    a
