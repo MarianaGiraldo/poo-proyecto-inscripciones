@@ -164,7 +164,7 @@ class Inscripciones:
         #Botón Eliminar
         self.btnEliminar = self.create_button(frm_1, "btneliminar", 'Eliminar', x=475, y=260,command=self.eliminar_Inscripcion)
         #Botón Cancelar
-        self.btnCancelar = self.create_button(frm_1, "btncancelar", 'Cancelar', x=600, y=260)
+        self.btnCancelar = self.create_button(frm_1, "btncancelar", 'Cancelar', x=600, y=260, command=self.cancel_operation)
 
     def create_button(self, parent, name, text, x, y, command = (lambda: None)):
         btn = ttk.Button(parent, name=name, text=text, command=command)
