@@ -249,10 +249,8 @@ class Inscripciones:
                     num_inscripcion = self.num_Inscripcion.get()
                     id_alumno = self.cmbx_Id_Alumno.get()
                     codigo_curso = self.cmbx_Id_Curso.get()
-                    horario = self.horario.get()
-                    fecha_Inscripcion=self.fecha.get()
-                    query="DELETE FROM Inscritos WHERE No_Inscripcion = ? AND Id_Alumno=? AND Codigo_Curso=? AND Horario=? AND Fecha_Inscripcion=?"
-                    params = ( num_inscripcion,  id_alumno,codigo_curso,horario,fecha_Inscripcion )
+                    query = "DELETE FROM Inscritos WHERE No_Inscripcion = ? AND Id_Alumno=? AND Codigo_Curso=?"
+                    params = (num_inscripcion, id_alumno, codigo_curso)
                     self.execute_db_query(query, params)
                     self.fill_inscritos(None)  # Actualiza la vista del treeview
                 except IndexError:
