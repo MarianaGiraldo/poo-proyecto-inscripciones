@@ -85,7 +85,8 @@ class Inscripciones:
         #Label Descripción del Curso
         self.lblDscCurso = self.create_label(frm_1, "lbldsccurso", 'Curso:', x=221, y=185)
         #Label Horario
-        self.lblHorario = self.create_label(frm_1, "lblhorario", 'Horario:', x=581, y=185)
+        self.lblHorario = self.create_label(frm_1, "lblhorario", 'Horario:', x=501, y=185)
+        self.lblHorario_hasta = self.create_label(frm_1, "lblhorario_hasta", 'a', x=670, y=185)
 
     def create_label(self, parent, name, text, x, y, bold=False):
         lbl = ttk.Label(parent, name=name)
@@ -112,9 +113,12 @@ class Inscripciones:
         #Entry Curso
         self.cmbx_Id_Curso = self.create_combobox(frm_1, "cmbx_id_curso", width=112, x=100, y=185)
         #Entry de Descripción del Curso
-        self.descripc_Curso = self.create_entry(frm_1, "descripc_curso", "left", width=300, x=271, y=185)
+        self.descripc_Curso = self.create_entry(frm_1, "descripc_curso", "left", width=220, x=271, y=185)
         #Entry del Horario
-        self.horario = self.create_entry(frm_1, "horario", "left", width=140, x=640, y=185)
+        self.horario_desde = self.create_combobox(frm_1, "cmbx_horario_desde", width=60, x=560, y=185)
+        self.horario_desde_am = self.create_combobox(frm_1, "cmbx_horario_desde_am", width=40, x=625, y=185)
+        self.horario_hasta = self.create_combobox(frm_1, "cmbx_horario_hasta", width=60, x=685, y=185)
+        self.horario_hasta_am = self.create_combobox(frm_1, "cmbx_horario_hasta_am", width=40, x=750, y=185)
 
     def create_entry(self, parent, name, justify, width, x, y):
         entry = ttk.Entry(parent, name=name)
