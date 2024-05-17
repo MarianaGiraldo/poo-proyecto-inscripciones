@@ -183,7 +183,7 @@ class Inscripciones:
             self.tView = self.create_treeview(self.frm_1)   
             mssg.showinfo("Cancelar operacion", "Operacion(es) cancelada(s)")
         else:
-            mssg.showerror("Cancelar operacion", "No hay operaciones para cancelar")
+            mssg.showerror("Cancelar operacion", "No hay operacion(es) para cancelar")
         
     def consultar_Inscripcion(self):
         num_inscripcion = self.num_Inscripcion.get()
