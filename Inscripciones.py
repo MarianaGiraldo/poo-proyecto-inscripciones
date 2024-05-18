@@ -315,17 +315,20 @@ class Inscripciones:
         self.tView.delete(*self.tView.get_children())
 
     def cancel_operation(self):
-        # bool_do_dates almacena la respuesta booleana de la existencia de datos en alguno de los Entry
         hasData = (self.fecha.get() != "") | (self.nombres.get() != "") | (self.apellidos.get() != "") | (
-            self.cmbx_Id_Curso.get() != "") | (self.descripc_Curso.get() != "") | (self.get_Horario() != "") | (self.num_Inscripcion.get() != "")
+        self.cmbx_Id_Curso.get() != "") | (self.descripc_Curso.get() != "") | (self.num_Inscripcion.get() != "") | (
+        self.horario_desde.get() !="") | (self.horario_desde_am.get() != "") | (self.horario_hasta.get() != "") |(
+        self.horario_hasta_am.get()!="")
+        
         if  hasData:
             self.create_entries(self.frm_1)
             self.fill_cmboxes()
             self.tView = self.create_treeview(self.frm_1)
+            
             mssg.showinfo("Cancelar operacion", "Operacion(es) cancelada(s)")
         else:
             mssg.showerror("Cancelar operacion", "No hay operacion(es) para cancelar")
-
+            
     def desactivar_Campos(self):
         # Disable all entry fields
         self.num_Inscripcion.config(state="disabled")
@@ -349,11 +352,13 @@ class Inscripciones:
 
 
     def eliminar_Inscripcion(self):
+        
         self.op= tk.StringVar()
         self.opcion_Eliminar()
         self.eliminar()
 
     def opcion_Eliminar(self):
+    
         self.new_win=tk.Toplevel(self.win)
         self.new_win.title('Eliminar Datos')
         new_win_width = 220
@@ -489,6 +494,7 @@ class Inscripciones:
                 except IndexError:
                     mssg.showerror("Error")
                 self.new_win.destroy()
+                
 
     def crear_Inscripcion(self):
         num_inscripcion = self.num_Inscripcion.get()
@@ -504,6 +510,10 @@ class Inscripciones:
             if result:
                 mssg.showinfo("Inscripción creada", "La inscripción se ha creado exitosamente")
                 self.fill_inscritos(None) # Actualiza la vista del treeview
+            else:
+                mssg.showerror("ERROR", "No se ha podido crear la inscripcion, faltan datos")
+        else:
+            mssg.showerror("ERROR", "No se ha podido crear la inscripcion, faltan datos")
 
     def leer_Inscripcion(self, num_inscripcion):
         query = "SELECT * FROM Inscritos WHERE No_Inscripcion = ? "
@@ -523,6 +533,10 @@ class Inscripciones:
             if result:
                 mssg.showinfo("Inscripción actualizada", "La inscripción se ha actualizado exitosamente")
                 self.fill_inscritos(None)  # Actualiza la vista del treeview
+            else:
+                mssg.showerror("ERROR", "No se ha podido actualizar informacion, faltan datos")
+        else:
+            mssg.showerror("ERROR", "No se ha podido actualizar informacion, faltan datos")
 
 # class Inscritos:
 #     table_Name = "Inscritos"
