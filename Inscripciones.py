@@ -145,10 +145,10 @@ class Inscripciones:
             try:
                 dia,mes,anio=map(int,self.fecha.get().split("/"))
                 datetime(anio,mes,dia)
-                break
+                return True
 
             except ValueError:
-                mssg.showerror("Error fecha equivocada")
+                mssg.showerror("Error", "Error fecha equivocada")
                 return False
 
     def create_combobox(self, parent, name, width, x, y):
@@ -499,7 +499,7 @@ class Inscripciones:
 
         query = "INSERT INTO Inscritos (No_Inscripcion, Codigo_Curso, Id_Alumno, Horario, Fecha_Inscripcion) VALUES (?, ?, ?, ?, ?)"
         params = (num_inscripcion, codigo_curso, id_alumno, horario, fecha_Inscripcion)
-        if self.validate_Horario(None):
+        if self.validate_Horario(None) and self.is_Valid_Date(None):
             result = self.execute_db_query(query, params)
             if result:
                 mssg.showinfo("Inscripción creada", "La inscripción se ha creado exitosamente")
@@ -518,7 +518,7 @@ class Inscripciones:
         fecha_Inscripcion=self.fecha.get()
         query = "UPDATE Inscritos SET Horario = ?, Fecha_Inscripcion = ? WHERE No_Inscripcion = ? AND Id_Alumno=? AND Codigo_Curso=?"
         params = ( horario,fecha_Inscripcion,num_inscripcion,  id_alumno,codigo_curso )
-        if self.validate_Horario(None):
+        if self.validate_Horario(None) and self.is_Valid_Date(None):
             result = self.execute_db_query(query, params)
             if result:
                 mssg.showinfo("Inscripción actualizada", "La inscripción se ha actualizado exitosamente")
