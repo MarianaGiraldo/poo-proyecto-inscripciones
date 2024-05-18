@@ -16,7 +16,7 @@ class Inscripciones:
     def __init__(self, master=None):
         # Ventana principal
         self.db_name = DB_PATH
-        self.win = self.create_main_window(master)
+        self.win = self.create_Main_Window(master)
         win_width = 800
         win_height = 600
 
@@ -32,30 +32,30 @@ class Inscripciones:
         self.win.geometry(f'{win_width}x{win_height}+{x}+{y}')
 
         # Crea los frames
-        self.frm_1 = self.create_frame(self.win)
+        self.frm_1 = self.create_Frame(self.win)
         # Crea los labels
-        self.create_labels(self.frm_1)
+        self.create_Labels(self.frm_1)
         #Crea los entries
-        self.create_entries(self.frm_1)
+        self.create_Entries(self.frm_1)
         ''' Botones  de la Aplicación'''
-        self.create_buttons(self.frm_1)
+        self.create_Buttons(self.frm_1)
         # Llenar los combobox
-        self.fill_cmboxes()
+        self.fill_Cmboxes()
         #Separador
         separator1 = ttk.Separator(self.frm_1)
         separator1.configure(orient="horizontal")
         separator1.place(anchor="nw", width=796, x=2, y=245)
         ''' Treeview de la Aplicación'''
         #Treeview
-        self.tView = self.create_treeview(self.frm_1)
+        self.tView = self.create_Treeview(self.frm_1)
         #Scrollbars
-        self.scroll_H, self.scroll_Y = self.create_scrollbars(self.frm_1)
+        self.scroll_H, self.scroll_Y = self.create_Scrollbars(self.frm_1)
         self.frm_1.pack(side="top")
         self.frm_1.pack_propagate(0)
         # Main widget
         self.mainwindow = self.win
 
-    def create_main_window(self, master):
+    def create_Main_Window(self, master):
         win = tk.Tk(master)
         win.configure(background="#f7f9fd", height=600, width=800)
         win.geometry("800x600")
@@ -64,63 +64,63 @@ class Inscripciones:
         win.title("Inscripciones de Materias y Cursos")
         return win
 
-    def create_frame(self, win, frame_name="frm_1"):
+    def create_Frame(self, win, frame_name="frm_1"):
         frm_1 = tk.Frame(win, name=frame_name)
         frm_1.configure(background="#f7f9fd", height=600, width=800)
         return frm_1
 
-    def create_labels(self, frm_1):
+    def create_Labels(self, frm_1):
         #Label No. Inscripción
-        self.lblNoInscripcion = self.create_label(frm_1, "lblnoinscripcion", 'No.Inscripción', x=680, y=20, bold=True)
+        self.lblNoInscripcion = self.create_Label(frm_1, "lblnoinscripcion", 'No.Inscripción', x=680, y=20, bold=True)
         #Label Fecha
-        self.lblFecha = self.create_label(frm_1, "lblfecha", 'Fecha:', x=630, y=80)
+        self.lblFecha = self.create_Label(frm_1, "lblfecha", 'Fecha:', x=630, y=80)
         #Label Alumno
-        self.lblIdAlumno = self.create_label(frm_1, "lblidalumno", 'Id Alumno:', x=20, y=80)
+        self.lblIdAlumno = self.create_Label(frm_1, "lblidalumno", 'Id Alumno:', x=20, y=80)
         #Label Alumno
-        self.lblNombres = self.create_label(frm_1, "lblnombres", 'Nombre(s):', x=20, y=130)
+        self.lblNombres = self.create_Label(frm_1, "lblnombres", 'Nombre(s):', x=20, y=130)
         #Label Apellidos
-        self.lblApellidos = self.create_label(frm_1, "lblapellidos", 'Apellido(s):', x=400, y=130)
+        self.lblApellidos = self.create_Label(frm_1, "lblapellidos", 'Apellido(s):', x=400, y=130)
         #Label Curso
-        self.lblIdCurso = self.create_label(frm_1, "lblidcurso", 'Id Curso:', x=20, y=185)
+        self.lblIdCurso = self.create_Label(frm_1, "lblidcurso", 'Id Curso:', x=20, y=185)
         #Label Descripción del Curso
-        self.lblDscCurso = self.create_label(frm_1, "lbldsccurso", 'Curso:', x=221, y=185)
+        self.lblDscCurso = self.create_Label(frm_1, "lbldsccurso", 'Curso:', x=221, y=185)
         #Label Horario
-        self.lblHorario = self.create_label(frm_1, "lblhorario", 'Horario:', x=501, y=185)
-        self.lblHorario_hasta = self.create_label(frm_1, "lblhorario_hasta", 'a', x=670, y=185)
+        self.lblHorario = self.create_Label(frm_1, "lblhorario", 'Horario:', x=501, y=185)
+        self.lblHorario_hasta = self.create_Label(frm_1, "lblhorario_hasta", 'a', x=670, y=185)
 
-    def create_label(self, parent, name, text, x, y, bold=False):
+    def create_Label(self, parent, name, text, x, y, bold=False):
         lbl = ttk.Label(parent, name=name)
         lbl.configure(background="#f7f9fd", font=f"Arial 11 {'bold' if bold else ''}",
                       justify="left", state="normal", takefocus=False, text=text)
         lbl.place(anchor="nw", x=x, y=y)
         return lbl
 
-    def create_entries(self, frm_1):
+    def create_Entries(self, frm_1):
         #Entry No. Inscripción
-        self.num_Inscripcion = self.create_combobox(frm_1, "cmbx_num_inscripcion", width=100, x=682, y=42)
+        self.num_Inscripcion = self.create_Combobox(frm_1, "cmbx_num_inscripcion", width=100, x=682, y=42)
         # Entry Fecha
-        self.fecha = self.create_entry(frm_1, "fecha", "center", width=90, x=680, y=80)
+        self.fecha = self.create_Entry(frm_1, "fecha", "center", width=90, x=680, y=80)
         self.fecha.config(validate="key", validatecommand=(self.fecha.register(lambda text: len(text) < 11), "%P"))
         self.fecha.bind("<KeyRelease>",self.format_Date_Input)
         self.fecha.bind("<BackSpace>",lambda _:self.fecha.delete(len(self.fecha.get())),"end")
         self.fecha.bind("<FocusOut>", self.is_Valid_Date)
         #Combobox Alumno
-        self.cmbx_Id_Alumno = self.create_combobox(frm_1, "cmbx_id_alumno", width=112, x=100, y=80)
+        self.cmbx_Id_Alumno = self.create_Combobox(frm_1, "cmbx_id_alumno", width=112, x=100, y=80)
         #Entry Alumno
-        self.nombres = self.create_entry(frm_1, "nombres", None, width=200, x=100, y=130)
+        self.nombres = self.create_Entry(frm_1, "nombres", None, width=200, x=100, y=130)
         #Entry Apellidos
-        self.apellidos = self.create_entry(frm_1, "apellidos", None, width=200, x=485, y=130)
+        self.apellidos = self.create_Entry(frm_1, "apellidos", None, width=200, x=485, y=130)
         #Entry Curso
-        self.cmbx_Id_Curso = self.create_combobox(frm_1, "cmbx_id_curso", width=112, x=100, y=185)
+        self.cmbx_Id_Curso = self.create_Combobox(frm_1, "cmbx_id_curso", width=112, x=100, y=185)
         #Entry de Descripción del Curso
-        self.descripc_Curso = self.create_entry(frm_1, "descripc_curso", "left", width=220, x=271, y=185)
+        self.descripc_Curso = self.create_Entry(frm_1, "descripc_curso", "left", width=220, x=271, y=185)
         #Entry del Horario
-        self.horario_desde = self.create_combobox(frm_1, "cmbx_horario_desde", width=60, x=560, y=185)
-        self.horario_desde_am = self.create_combobox(frm_1, "cmbx_horario_desde_am", width=40, x=625, y=185)
-        self.horario_hasta = self.create_combobox(frm_1, "cmbx_horario_hasta", width=60, x=685, y=185)
-        self.horario_hasta_am = self.create_combobox(frm_1, "cmbx_horario_hasta_am", width=40, x=750, y=185)
+        self.horario_desde = self.create_Combobox(frm_1, "cmbx_horario_desde", width=60, x=560, y=185)
+        self.horario_desde_am = self.create_Combobox(frm_1, "cmbx_horario_desde_am", width=40, x=625, y=185)
+        self.horario_hasta = self.create_Combobox(frm_1, "cmbx_horario_hasta", width=60, x=685, y=185)
+        self.horario_hasta_am = self.create_Combobox(frm_1, "cmbx_horario_hasta_am", width=40, x=750, y=185)
 
-    def create_entry(self, parent, name, justify, width, x, y):
+    def create_Entry(self, parent, name, justify, width, x, y):
         entry = ttk.Entry(parent, name=name)
         if justify:
             entry.configure(justify=justify)
@@ -151,33 +151,33 @@ class Inscripciones:
                 mssg.showerror("Error", "Error fecha equivocada")
                 return False
 
-    def create_combobox(self, parent, name, width, x, y):
+    def create_Combobox(self, parent, name, width, x, y):
         cmbx = ttk.Combobox(parent, name=name)
         cmbx.place(anchor="nw", width=width, x=x, y=y)
         # Prevent from typing a value
         cmbx['state'] = 'readonly'
         return cmbx
 
-    def create_buttons(self, frm_1):
+    def create_Buttons(self, frm_1):
         # Botón de nueva inscripción
-        self.btnNuevaInscripcion = self.create_button(frm_1, "btnnuevainscripcion", 'Nueva Inscripción', x=570, y=42, command=self.nueva_Inscripcion)
+        self.btnNuevaInscripcion = self.create_Button(frm_1, "btnnuevainscripcion", 'Nueva Inscripción', x=570, y=42, command=self.nueva_Inscripcion)
         #Botón Consultar
-        self.btnConsultar = self.create_button(frm_1, "btnconsultar", 'Consultar', x=100, y=260,command=self.consultar_Inscripcion)
+        self.btnConsultar = self.create_Button(frm_1, "btnconsultar", 'Consultar', x=100, y=260,command=self.consultar_Inscripcion)
         #Botón Guardar
-        self.btnGuardar = self.create_button(frm_1, "btnguardar", 'Guardar', x=225, y=260,command=self.crear_Inscripcion)
+        self.btnGuardar = self.create_Button(frm_1, "btnguardar", 'Guardar', x=225, y=260,command=self.crear_Inscripcion)
         #Botón Editar
-        self.btnEditar = self.create_button(frm_1, "btneditar", 'Editar', x=350, y=260,command=self.actualizar_Inscripcion)
+        self.btnEditar = self.create_Button(frm_1, "btneditar", 'Editar', x=350, y=260,command=self.actualizar_Inscripcion)
         #Botón Eliminar
-        self.btnEliminar = self.create_button(frm_1, "btneliminar", 'Eliminar', x=475, y=260,command=self.eliminar_Inscripcion)
+        self.btnEliminar = self.create_Button(frm_1, "btneliminar", 'Eliminar', x=475, y=260,command=self.eliminar_Inscripcion)
         #Botón Cancelar
-        self.btnCancelar = self.create_button(frm_1, "btncancelar", 'Cancelar', x=600, y=260,command=self.cancel_operation)
+        self.btnCancelar = self.create_Button(frm_1, "btncancelar", 'Cancelar', x=600, y=260,command=self.cancel_Operation)
 
-    def create_button(self, parent, name, text, x, y, command = (lambda: None)):
+    def create_Button(self, parent, name, text, x, y, command = (lambda: None)):
         btn = ttk.Button(parent, name=name, text=text, command=command)
         btn.place(anchor="nw", x=x, y=y)
         return btn
 
-    def create_treeview(self, frm_1):
+    def create_Treeview(self, frm_1):
         tView = ttk.Treeview(frm_1, name="tview")
         tView.configure(selectmode="extended")
 
@@ -199,7 +199,7 @@ class Inscripciones:
         tView.place(anchor="nw", height=300, width=790, x=4, y=300)
         return tView
 
-    def create_scrollbars(self, frm_1):
+    def create_Scrollbars(self, frm_1):
         scroll_H = ttk.Scrollbar(frm_1, name="scroll_h")
         scroll_H.configure(orient="horizontal")
         scroll_H.place(anchor="s", height=12, width=1534, x=15, y=595)
@@ -209,7 +209,7 @@ class Inscripciones:
         scroll_Y.place(anchor="s", height=275, width=12, x=790, y=582)
         return scroll_H, scroll_Y
 
-    def fill_alumno_data(self, _):
+    def fill_Alumno_Data(self, _):
         """
         This function is triggered when a selection is made in the 'cmbx_Id_Alumno' combobox.
         It fetches the selected student's data from the 'Alumnos' table and fills the 'nombres' and 'apellidos' fields.
@@ -220,14 +220,14 @@ class Inscripciones:
         #  Obtain the selected student's ID
         id_alumno = self.cmbx_Id_Alumno.get()
         # Fetch the selected student's data
-        alumno = self.get_one_from_table("Alumnos", "Nombres, Apellidos", ("Id_Alumno", id_alumno))
+        alumno = self.get_One_From_Table("Alumnos", "Nombres, Apellidos", ("Id_Alumno", id_alumno))
         self.nombres.delete(0, tk.END)
         self.apellidos.delete(0, tk.END)
         if len(alumno) > 0:
             self.nombres.insert(0, alumno[0])
             self.apellidos.insert(0, alumno[1])
 
-    def fill_curso_data(self, _):
+    def fill_Curso_Data(self, _):
         """
         This function is triggered when a selection is made in the 'cmbx_Id_Curso' combobox.
         It fetches the selected course's data from the 'Cursos' table and fills the 'descripc_Curso' field.
@@ -238,13 +238,13 @@ class Inscripciones:
         #  Obtain the selected course's ID
         id_curso = self.cmbx_Id_Curso.get()
         # Fetch the selected course's data
-        curso = self.get_one_from_table("Cursos", "Descrip_Curso", ("Codigo_Curso", id_curso))
+        curso = self.get_One_From_Table("Cursos", "Descrip_Curso", ("Codigo_Curso", id_curso))
         self.descripc_Curso.delete(0, tk.END)
         if len(curso) > 0:
             self.descripc_Curso.insert(0, curso[0])
 
-    def fill_inscritos(self, _):
-        result = self.get_data_from_inscritos(self.num_Inscripcion.get())
+    def fill_Inscritos(self, _):
+        result = self.get_Data_From_Inscritos(self.num_Inscripcion.get())
         # Clear the treeView
         self.tView.delete(*self.tView.get_children())
 
@@ -252,27 +252,27 @@ class Inscripciones:
         for record in result:
             self.tView.insert("", tk.END, text=record[0], values=(record[3], record[1], record[4], record[5]))
 
-    def fill_cmboxes(self):
+    def fill_Cmboxes(self):
         """
         This function fills the 'cmbx_Id_Alumno' and 'cmbx_Id_Curso' comboboxes with data from the 'Alumnos' and 'Cursos' tables respectively.
         It also binds the '<<ComboboxSelected>>' event to the 'fill_alumno_data' and 'fill_curso_data' functions for the respective comboboxes.
         """
         # Fill the 'cmbx_Id_Alumno' combobox with data
-        alumnos = self.get_all_from_table("Alumnos", "Id_Alumno")
+        alumnos = self.get_All_From_Table("Alumnos", "Id_Alumno")
         self.cmbx_Id_Alumno["values"] = [alumno[0] for alumno in alumnos]
         # Bind the '<<ComboboxSelected>>' event to the 'fill_alumno_data' function
-        self.cmbx_Id_Alumno.bind("<<ComboboxSelected>>", self.fill_alumno_data)
+        self.cmbx_Id_Alumno.bind("<<ComboboxSelected>>", self.fill_Alumno_Data)
 
         # Fill the 'cmbx_Id_Curso' combobox with data
-        cursos = self.get_all_from_table("Cursos", "Codigo_Curso")
+        cursos = self.get_All_From_Table("Cursos", "Codigo_Curso")
         self.cmbx_Id_Curso["values"] = [curso[0] for curso in cursos]
         # Bind the '<<ComboboxSelected>>' event to the 'fill_curso_data' function
-        self.cmbx_Id_Curso.bind("<<ComboboxSelected>>", self.fill_curso_data)
+        self.cmbx_Id_Curso.bind("<<ComboboxSelected>>", self.fill_Curso_Data)
 
         # Fill the 'cmbx_num_Inscripcion' combobox with data
-        inscripciones = self.get_all_from_table("Inscritos", "No_Inscripcion", group="No_Inscripcion", order="No_Inscripcion ASC")
+        inscripciones = self.get_All_From_Table("Inscritos", "No_Inscripcion", group="No_Inscripcion", order="No_Inscripcion ASC")
         self.num_Inscripcion["values"] = [inscripcion[0] for inscripcion in inscripciones]
-        self.num_Inscripcion.bind("<<ComboboxSelected>>", self.fill_inscritos)
+        self.num_Inscripcion.bind("<<ComboboxSelected>>", self.fill_Inscritos)
 
         horas_del_dia = ["01:00", "02:00", "03:00", "04:00", "05:00", "06:00", "07:00", "08:00", "09:00", "10:00", "11:00", "12:00"]
         am_pm = ["AM", "PM"]
@@ -311,24 +311,24 @@ class Inscripciones:
         This function is triggered when the 'Nueva Inscripción' button is clicked.
         It clears the entries and comboboxes to allow the user to create a new registration.
         """
-        self.num_Inscripcion.set(self.get_next_inscripcion())
+        self.num_Inscripcion.set(self.get_Next_Inscripcion())
         self.tView.delete(*self.tView.get_children())
 
-    def cancel_operation(self):
+    def cancel_Operation(self):
         hasData = (self.fecha.get() != "") | (self.nombres.get() != "") | (self.apellidos.get() != "") | (
         self.cmbx_Id_Curso.get() != "") | (self.descripc_Curso.get() != "") | (self.num_Inscripcion.get() != "") | (
         self.horario_desde.get() !="") | (self.horario_desde_am.get() != "") | (self.horario_hasta.get() != "") |(
         self.horario_hasta_am.get()!="")
-        
+
         if  hasData:
-            self.create_entries(self.frm_1)
-            self.fill_cmboxes()
-            self.tView = self.create_treeview(self.frm_1)
-            
+            self.create_Entries(self.frm_1)
+            self.fill_Cmboxes()
+            self.tView = self.create_Treeview(self.frm_1)
+
             mssg.showinfo("Cancelar operacion", "Operacion(es) cancelada(s)")
         else:
             mssg.showerror("Cancelar operacion", "No hay operacion(es) para cancelar")
-            
+
     def desactivar_Campos(self):
         # Disable all entry fields
         self.num_Inscripcion.config(state="disabled")
@@ -345,20 +345,18 @@ class Inscripciones:
             self.cmbx_Id_Alumno.set(result[0][1])
             self.fecha.delete(0, tk.END)
             self.fecha.insert(0, result[0][2])
-            self.fill_inscritos(None)
+            self.fill_Inscritos(None)
             self.desactivar_Campos()
         else:
             mssg.showinfo("Inscripción no encontrada", f"No se encontró una inscripción con el número: {num_inscripcion}")
 
-
     def eliminar_Inscripcion(self):
-        
+
         self.op= tk.StringVar()
         self.opcion_Eliminar()
         self.eliminar()
 
     def opcion_Eliminar(self):
-    
         self.new_win=tk.Toplevel(self.win)
         self.new_win.title('Eliminar Datos')
         new_win_width = 220
@@ -390,7 +388,7 @@ class Inscripciones:
     ''' A partir de este punto se deben incluir las funciones
     para el manejo de la base de datos '''
 
-    def execute_db_query(self, query, params=()) -> Union[sqlite3.Cursor, None]:
+    def execute_DB_Query(self, query, params=()) -> Union[sqlite3.Cursor, None]:
         """
         Executes a database query and returns the result.
 
@@ -411,7 +409,7 @@ class Inscripciones:
             logger.error("Error executing SQLite query: %s", e)
         return None
 
-    def get_all_from_table(self, table_name, fields: str = "*", group: str = "", order: str = ""):
+    def get_All_From_Table(self, table_name, fields: str = "*", group: str = "", order: str = ""):
         """
         Retrieves all records from a specified table in the database.
 
@@ -427,10 +425,10 @@ class Inscripciones:
             query += f" GROUP BY {group}"
         if order != "":
             query += f" ORDER BY {order}"
-        result = self.execute_db_query(query)
+        result = self.execute_DB_Query(query)
         return result.fetchall() if result else []
 
-    def get_one_from_table(self, table_name, fields: str = "*", where: tuple = ()):
+    def get_One_From_Table(self, table_name, fields: str = "*", where: tuple = ()):
         """
         Retrieves a single row from the specified table based on the given conditions.
 
@@ -445,10 +443,10 @@ class Inscripciones:
             tuple: A single row from the table that matches the given conditions, or an empty list if no match is found.
         """
         query = f"SELECT {fields} FROM {table_name} WHERE {where[0]} = ?"
-        result = self.execute_db_query(query, (where[1],))
+        result = self.execute_DB_Query(query, (where[1],))
         return result.fetchone() if result else []
 
-    def get_data_from_inscritos(self, num_inscripcion: int):
+    def get_Data_From_Inscritos(self, num_inscripcion: int):
         # Get data from tabla Inscritos. Fields: No_Inscripcion, Codigo_Curso, Id_Alumno, Descrip_Curso, Horario
         query = """
         SELECT i.No_Inscripcion, i.Id_Alumno, i.Fecha_Inscripcion, i.Codigo_Curso, c.Descrip_Curso, i.Horario
@@ -457,11 +455,11 @@ class Inscripciones:
         WHERE i.No_Inscripcion = ?
         """
         # Execute the query and get object instances from the result
-        result = self.execute_db_query(query, (num_inscripcion,))
+        result = self.execute_DB_Query(query, (num_inscripcion,))
         return result.fetchall() if result else []
         # return [Inscritos(*record) for record in result.fetchall()] if result else []
 
-    def get_next_inscripcion(self):
+    def get_Next_Inscripcion(self):
         """
         Retrieves the next available 'No_Inscripcion' value from the 'Inscritos' table.
 
@@ -469,7 +467,7 @@ class Inscripciones:
             int: The next available 'No_Inscripcion' value.
         """
         query = "SELECT MAX(No_Inscripcion) FROM Inscritos"
-        result = self.execute_db_query(query)
+        result = self.execute_DB_Query(query)
         num_Inscripcion = result.fetchone()[0]
         return num_Inscripcion + 1 if num_Inscripcion else 1
 
@@ -483,20 +481,19 @@ class Inscripciones:
                     codigo_curso = self.cmbx_Id_Curso.get()
                     query = "DELETE FROM Inscritos WHERE No_Inscripcion = ? AND Id_Alumno=? AND Codigo_Curso=?"
                     params = (num_inscripcion, id_alumno, codigo_curso)
-                    self.execute_db_query(query, params)
-                    self.fill_inscritos(None)  # Actualiza la vista del treeview
+                    self.execute_DB_Query(query, params)
+                    self.fill_Inscritos(None)  # Actualiza la vista del treeview
                 except IndexError:
                     mssg.showerror("Error")
             elif eleccion=='2':
                 try:
                     num_inscripcion = self.num_Inscripcion.get()
                     query = "DELETE FROM Inscritos WHERE No_Inscripcion = ? "
-                    self.execute_db_query(query, (num_inscripcion,))
-                    self.fill_inscritos(None)  # Actualiza la vista del treeview
+                    self.execute_DB_Query(query, (num_inscripcion,))
+                    self.fill_Inscritos(None)  # Actualiza la vista del treeview
                 except IndexError:
                     mssg.showerror("Error")
                 self.new_win.destroy()
-                
 
     def crear_Inscripcion(self):
         num_inscripcion = self.num_Inscripcion.get()
@@ -508,10 +505,10 @@ class Inscripciones:
         query = "INSERT INTO Inscritos (No_Inscripcion, Codigo_Curso, Id_Alumno, Horario, Fecha_Inscripcion) VALUES (?, ?, ?, ?, ?)"
         params = (num_inscripcion, codigo_curso, id_alumno, horario, fecha_Inscripcion)
         if self.validate_Horario(None) and self.is_Valid_Date(None):
-            result = self.execute_db_query(query, params)
+            result = self.execute_DB_Query(query, params)
             if result:
                 mssg.showinfo("Inscripción creada", "La inscripción se ha creado exitosamente")
-                self.fill_inscritos(None) # Actualiza la vista del treeview
+                self.fill_Inscritos(None) # Actualiza la vista del treeview
             else:
                 mssg.showerror("ERROR", "No se ha podido crear la inscripcion, faltan datos")
         else:
@@ -519,7 +516,7 @@ class Inscripciones:
 
     def leer_Inscripcion(self, num_inscripcion):
         query = "SELECT * FROM Inscritos WHERE No_Inscripcion = ? "
-        result = self.execute_db_query(query, (num_inscripcion,))
+        result = self.execute_DB_Query(query, (num_inscripcion,))
         return result.fetchall()
 
     def actualizar_Inscripcion(self):
@@ -531,10 +528,10 @@ class Inscripciones:
         query = "UPDATE Inscritos SET Horario = ?, Fecha_Inscripcion = ? WHERE No_Inscripcion = ? AND Id_Alumno=? AND Codigo_Curso=?"
         params = ( horario,fecha_Inscripcion,num_inscripcion,  id_alumno,codigo_curso )
         if self.validate_Horario(None) and self.is_Valid_Date(None):
-            result = self.execute_db_query(query, params)
+            result = self.execute_DB_Query(query, params)
             if result:
                 mssg.showinfo("Inscripción actualizada", "La inscripción se ha actualizado exitosamente")
-                self.fill_inscritos(None)  # Actualiza la vista del treeview
+                self.fill_Inscritos(None)  # Actualiza la vista del treeview
             else:
                 mssg.showerror("ERROR", "No se ha podido actualizar informacion, faltan datos")
         else:
