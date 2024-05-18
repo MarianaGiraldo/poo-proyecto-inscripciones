@@ -470,7 +470,9 @@ class Inscripciones:
         """
         query = "SELECT MAX(No_Inscripcion) FROM Inscritos"
         result = self.execute_db_query(query)
-        return result.fetchone()[0] + 1 if result else 1
+        num_Inscripcion = result.fetchone()[0]
+        return num_Inscripcion + 1 if num_Inscripcion else 1
+
     def eliminar(self):
         eleccion=self.var.get()
         if eleccion is not None:
