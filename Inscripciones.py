@@ -341,28 +341,34 @@ class Inscripciones:
         self.descripc_Curso.config(state="disabled")
 
     def consultar_Inscripcion(self):
+
+        item_click = self.tView.focus()
+        item_values = self.tView.item(item_click, "values")
+
         num_inscripcion = self.num_Inscripcion.get()
+
         result = self.leer_Inscripcion(num_inscripcion)
 
         if len(result) > 0:
-            getnames = self.leer_Alumnos(result[0][1])
-            self.cmbx_Id_Alumno.delete(result[0][1])
-            self.cmbx_Id_Alumno.set(result[0][1])
-            self.fecha.delete(0, tk.END)
-            self.fecha.insert(0, result[0][2])
+            getnames = self.leer_Alumnos(item_values[1])
+            self.cmbx_Id_Alumno.delete(item_values[1])
+            self.cmbx_Id_Alumno.set(item_values[1])
 
-            self.nombres.delete(0, tk.END)
-            self.nombres.insert(0, getnames[0][2])
+            self.fill_Alumno_Data(None)
 
-            self.apellidos.delete(0, tk.END)
-            self.apellidos.insert(0, getnames[0][3])
+            self.cmbx_Id_Curso.delete(0, tk.END)
+            self.cmbx_Id_Curso.set(item_values[0])
 
-            self.fill_Inscritos(None)
+            self.fill_Curso_Data(None)
+            # self.fecha.delete(0, tk.END)
+            # self.fecha.insert(0, item_values[1])
+
+            # self.fill_Inscritos(None)
             self.desactivar_Campos()
         else:
             mssg.showinfo("Inscripción no encontrada",
                           f"No se encontró una inscripción con el número: {num_inscripcion}")
-
+            
     def eliminar_Inscripcion(self):
 
         self.op= tk.StringVar()
