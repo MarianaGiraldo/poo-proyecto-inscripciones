@@ -343,14 +343,25 @@ class Inscripciones:
     def consultar_Inscripcion(self):
         num_inscripcion = self.num_Inscripcion.get()
         result = self.leer_Inscripcion(num_inscripcion)
+
         if len(result) > 0:
+            getnames = self.leer_Alumnos(result[0][1])
+            self.cmbx_Id_Alumno.delete(result[0][1])
             self.cmbx_Id_Alumno.set(result[0][1])
             self.fecha.delete(0, tk.END)
             self.fecha.insert(0, result[0][2])
+
+            self.nombres.delete(0, tk.END)
+            self.nombres.insert(0, getnames[0][2])
+
+            self.apellidos.delete(0, tk.END)
+            self.apellidos.insert(0, getnames[0][3])
+
             self.fill_Inscritos(None)
             self.desactivar_Campos()
         else:
-            mssg.showinfo("Inscripción no encontrada", f"No se encontró una inscripción con el número: {num_inscripcion}")
+            mssg.showinfo("Inscripción no encontrada",
+                          f"No se encontró una inscripción con el número: {num_inscripcion}")
 
     def eliminar_Inscripcion(self):
 
@@ -551,6 +562,11 @@ class Inscripciones:
     def leer_Inscripcion(self, num_inscripcion):
         query = "SELECT * FROM Inscritos WHERE No_Inscripcion = ? "
         result = self.execute_DB_Query(query, (num_inscripcion,))
+        return result.fetchall()
+    
+    def leer_Alumnos(self, id_alumno):
+        query = "SELECT * FROM Alumnos WHERE Id_Alumno = ? "
+        result = self.execute_DB_Query(query, (id_alumno,))
         return result.fetchall()
 
     def actualizar_Inscripcion(self):
