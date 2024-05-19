@@ -54,6 +54,7 @@ class Inscripciones:
         self.frm_1.pack_propagate(0)
         # Main widget
         self.mainwindow = self.win
+        self.crear_Estilos()
 
     def create_Main_Window(self, master):
         win = tk.Tk(master)
@@ -90,7 +91,7 @@ class Inscripciones:
 
     def create_Label(self, parent, name, text, x, y, bold=False):
         lbl = ttk.Label(parent, name=name)
-        lbl.configure(background="#f7f9fd", font=f"Arial 11 {'bold' if bold else ''}",
+        lbl.configure(font=f"Arial 11 {'bold' if bold else ''}",
                       justify="left", state="normal", takefocus=False, text=text)
         lbl.place(anchor="nw", x=x, y=y)
         return lbl
@@ -156,11 +157,12 @@ class Inscripciones:
         cmbx.place(anchor="nw", width=width, x=x, y=y)
         # Prevent from typing a value
         cmbx['state'] = 'readonly'
+        cmbx.configure(justify="center", font="Arial 11", background="white", foreground="black")
         return cmbx
 
     def create_Buttons(self, frm_1):
         # Botón de nueva inscripción
-        self.btnNuevaInscripcion = self.create_Button(frm_1, "btnnuevainscripcion", 'Nueva Inscripción', x=570, y=42, command=self.nueva_Inscripcion)
+        self.btnNuevaInscripcion = self.create_Button(frm_1, "btnnuevainscripcion", 'Nueva Inscripción', x=550, y=37, command=self.nueva_Inscripcion)
         #Botón Consultar
         self.btnConsultar = self.create_Button(frm_1, "btnconsultar", 'Consultar', x=100, y=260,command=self.consultar_Inscripcion)
         #Botón Guardar
@@ -178,8 +180,8 @@ class Inscripciones:
         return btn
 
     def create_Treeview(self, frm_1):
-        tView = ttk.Treeview(frm_1, name="tview")
-        tView.configure(selectmode="extended")
+        tView = ttk.Treeview(frm_1, name="tview", style="mystyle.Treeview", selectmode="browse")
+
 
         config_map = {
             "#0": {"width": 7, "minwidth": 7, "heading": '# Inscripción'},
@@ -196,7 +198,7 @@ class Inscripciones:
             tView.column(col, anchor="w", stretch=True, width=config["width"], minwidth=config["minwidth"])
             tView.heading(col, anchor="w", text=config["heading"])
 
-        tView.place(anchor="nw", height=300, width=790, x=4, y=300)
+        tView.place(anchor="nw", height=300, width=790, x=4, y=320)
         return tView
 
     def create_Scrollbars(self, frm_1):
@@ -380,6 +382,38 @@ class Inscripciones:
         ttk.Button(self.new_win, text="Aceptar", command=self.eliminar).pack()
         ttk.Button(self.new_win, text="Cancelar", command=self.new_win.destroy).pack()
 
+    def crear_Estilos(self):
+        style = ttk.Style(self.win)
+        # Update the default settings for all widgets
+        style.theme_use("clam")
+        # Update frame background color
+        self.frm_1.configure(background="#ECF5FE")
+
+        # Styles for the treeview
+        style.configure("Treeview", font=("Arial", 10), rowheight=25, foreground="black", background="#FFFEE0")
+        style.configure("Treeview.Heading", font=("Arial", 10, "bold"), background="#7AB0CD", relief="flat")
+
+        # Styles for the buttons
+        style.configure('TButton', font =
+                    ('calibri', 11, 'bold'),
+                            borderwidth = '4', padding=2, relief="flat", background="#B6D8F6", foreground="black")
+        style.map('TButton', background = [('active', '#7AB0CD')])
+
+        # Styles for the comboboxes
+        style.configure("TCombobox", font=("Arial", 1), background="white", foreground="black")
+
+        style.map('TCombobox', fieldbackground=[('readonly','white')])
+        style.map('TCombobox', selectbackground=[('readonly', 'white')])
+        style.map('TCombobox', selectforeground=[('readonly', 'black')])
+
+
+        # Scrollbar styles
+        style.configure("Vertical.TScrollbar", gripcount=0,
+            background="#36494E"
+        )
+
+        # Label styles
+        style.configure("TLabel", background="#ECF5FE", foreground="black")
 
     def run(self):
         self.mainwindow.mainloop()
