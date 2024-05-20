@@ -565,7 +565,7 @@ class Inscripciones:
                     query = "DELETE FROM Inscritos WHERE No_Inscripcion = ? AND Id_Alumno=? AND Codigo_Curso=?"
                     params = (num_inscripcion, id_alumno, codigo_curso)
                     result = self.execute_DB_Query(query, params)
-                    if result:
+                    if result and result.rowcount > 0:
                         self.create_Entries(self.frm_1)
                         self.num_Inscripcion.set(num_inscripcion)
                         self.fill_Cmboxes()
@@ -584,7 +584,8 @@ class Inscripciones:
                         mssg.showerror("Error", "No se ha seleccionado ningun registro")
                         return
                     query = "DELETE FROM Inscritos WHERE No_Inscripcion = ? "
-                    if self.execute_DB_Query(query, (num_inscripcion,)):
+                    result = self.execute_DB_Query(query, (num_inscripcion,))
+                    if result and result.rowcount > 0:
                         self.num_Inscripcion.set("")
                         self.create_Entries(self.frm_1)
                         self.fill_Cmboxes()
