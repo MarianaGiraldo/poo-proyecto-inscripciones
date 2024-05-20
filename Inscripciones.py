@@ -339,30 +339,38 @@ class Inscripciones:
         self.apellidos.config(state="disabled")
         self.cmbx_Id_Curso.config(state="disabled")
         self.descripc_Curso.config(state="disabled")
+        self.fecha.config(state="disabled")
+        self.horario_desde.config(state="disabled")
+        self.horario_desde_am.config(state="disabled")
+        self.horario_hasta.config(state="disabled")
+        self.horario_hasta_am.config(state="disabled")
 
     def consultar_Inscripcion(self):
 
         item_click = self.tView.focus()
         item_values = self.tView.item(item_click, "values")
-
         num_inscripcion = self.num_Inscripcion.get()
-
         result = self.leer_Inscripcion(num_inscripcion)
-
+        datecurs_click = [r for r in result if r[1] ==
+                          item_values[1] and r[3] == item_values[0]]
         if len(result) > 0:
             getnames = self.leer_Alumnos(item_values[1])
             self.cmbx_Id_Alumno.delete(item_values[1])
             self.cmbx_Id_Alumno.set(item_values[1])
-
             self.fill_Alumno_Data(None)
-
             self.cmbx_Id_Curso.delete(0, tk.END)
             self.cmbx_Id_Curso.set(item_values[0])
-
             self.fill_Curso_Data(None)
-            # self.fecha.delete(0, tk.END)
-            # self.fecha.insert(0, item_values[1])
-
+            self.fecha.delete(0, tk.END)
+            self.fecha.insert(0, datecurs_click[0][2])
+            self.horario_desde.delete(0, tk.END)
+            self.horario_desde.set('0'+datecurs_click[0][4][0:4])
+            self.horario_desde_am.delete(0, tk.END)
+            self.horario_desde_am.set(datecurs_click[0][4][10::].upper())
+            self.horario_hasta.delete(0, tk.END)
+            self.horario_hasta.set('0'+datecurs_click[0][4][5:9])
+            self.horario_hasta_am.delete(0, tk.END)
+            self.horario_hasta_am.set(datecurs_click[0][4][10::].upper())
             # self.fill_Inscritos(None)
             self.desactivar_Campos()
         else:
