@@ -183,7 +183,7 @@ class Inscripciones:
     def create_Treeview(self, frm_1):
         tView = ttk.Treeview(frm_1, name="tview", style="mystyle.Treeview", selectmode="browse")
 
-        config_map = {
+        columns = {
             "#0": {"width": 7, "minwidth": 7, "heading": '# Inscripción'},
             "curso": {"width": 30, "minwidth": 20, "heading": 'Curso'},
             "id_alumno": {"width": 30, "minwidth": 20, "heading": 'Id Alumno'},
@@ -191,10 +191,10 @@ class Inscripciones:
             "horario": {"width": 30, "minwidth": 20, "heading": 'Horario'}
         }
 
-        cols = list(config_map.keys())
+        cols = list(columns.keys())
         tView.configure(columns=cols[1:], displaycolumns=cols[1:])
 
-        for col, config in config_map.items():
+        for col, config in columns.items():
             tView.column(col, anchor="w", stretch=True, width=config["width"], minwidth=config["minwidth"])
             tView.heading(col, anchor="w", text=config["heading"])
 
@@ -211,7 +211,7 @@ class Inscripciones:
         scroll_Y.place(anchor="s", height=275, width=12, x=790, y=582)
         return scroll_H, scroll_Y
 
-    def fill_Alumno_Data(self, _):
+    def fill_Alumno_Data(self, _ = None):
         """
         This function is triggered when a selection is made in the 'cmbx_Id_Alumno' combobox.
         It fetches the selected student's data from the 'Alumnos' table and fills the 'nombres' and 'apellidos' fields.
@@ -229,7 +229,7 @@ class Inscripciones:
             self.nombres.insert(0, alumno[0])
             self.apellidos.insert(0, alumno[1])
 
-    def fill_Curso_Data(self, _):
+    def fill_Curso_Data(self, _ = None):
         """
         This function is triggered when a selection is made in the 'cmbx_Id_Curso' combobox.
         It fetches the selected course's data from the 'Cursos' table and fills the 'descripc_Curso' field.
@@ -245,7 +245,7 @@ class Inscripciones:
         if len(curso) > 0:
             self.descripc_Curso.insert(0, curso[0])
 
-    def fill_Inscritos(self, _):
+    def fill_Inscritos(self, _ = None):
         result = self.get_Data_From_Inscritos(self.num_Inscripcion.get())
         # Clear the treeView
         self.tView.delete(*self.tView.get_children())
@@ -310,8 +310,9 @@ class Inscripciones:
             if horario_desde_am == "PM":
                 self.show_Error_Horario()
                 return False
-
+        # Check if all fields have a value
         if all([horario_desde, horario_desde_am, horario_hasta, horario_hasta_am]):
+            # Check if the 'horario_desde' value is greater than the 'horario_hasta' value
             if (horario_desde_am == horario_hasta_am and horario_desde >= horario_hasta) or (horario_desde_am == "PM" and horario_hasta_am == "AM"):
                 self.show_Error_Horario()
                 return False
@@ -322,6 +323,7 @@ class Inscripciones:
         """
         This function retrieves the 'horario' value from the 'horario_desde' and 'horario_hasta' comboboxes.
         """
+        # Check if all fields have a value
         if not all([self.horario_desde.get(), self.horario_desde_am.get(), self.horario_hasta.get(), self.horario_hasta_am.get()]):
             return ""
         horario_desde = self.horario_desde.get() + " " + self.horario_desde_am.get()
@@ -350,7 +352,10 @@ class Inscripciones:
             mssg.showerror("Cancelar operacion", "No hay operacion(es) para cancelar")
 
     def desactivar_Campos(self):
-        # Disable all entry fields
+        """
+        The function `desactivar_Campos` disables certain entry fields to prevent modification during
+        consultation or editing.
+        """
         self.num_Inscripcion.config(state="disabled")
         self.cmbx_Id_Alumno.config(state="disabled")
         self.nombres.config(state="disabled")
@@ -361,6 +366,7 @@ class Inscripciones:
     def consultar_Inscripcion(self):
         item_click = self.tView.focus()
         item_values = self.tView.item(item_click, "values")
+        # Check if an item has been selected
         if len(item_values) == 0:
             mssg.showerror("Error", "No se ha seleccionado ninguna inscripción para consultar")
             return
@@ -377,11 +383,12 @@ class Inscripciones:
             self.create_Entries(self.frm_1)
             # Llenar los combobox
             self.fill_Cmboxes()
+            # Llenar todos los campos
             self.num_Inscripcion.set(num_inscripcion)
             self.cmbx_Id_Alumno.set(id_alumno)
-            self.fill_Alumno_Data(None)
+            self.fill_Alumno_Data()
             self.cmbx_Id_Curso.set(cod_curso)
-            self.fill_Curso_Data(None)
+            self.fill_Curso_Data()
             self.fecha.insert(0, fecha)
             self.horario_desde.set(horario[0:5])
             self.horario_desde_am.set(horario[6:8])
@@ -414,10 +421,10 @@ class Inscripciones:
         self.eliminar_window.geometry(f'{new_win_width}x{new_win_height}+{x}+{y}')
         self.frame=tk.Frame(self.eliminar_window,borderwidth=2,relief="groove")
         self.frame.pack(padx=10,pady=10)
-        self.var=tk.StringVar()
-        self.var.set(None)
-        ttk.Radiobutton(self.frame,text="Eliminar uno",variable=self.var,value=1).pack(anchor='w')
-        ttk.Radiobutton(self.frame,text="Eliminar todos",variable=self.var,value=2).pack(anchor='w')
+        self.delete_option_selected=tk.StringVar()
+        self.delete_option_selected.set(None)
+        ttk.Radiobutton(self.frame,text="Eliminar uno",variable=self.delete_option_selected,value=1).pack(anchor='w')
+        ttk.Radiobutton(self.frame,text="Eliminar todos",variable=self.delete_option_selected,value=2).pack(anchor='w')
         ttk.Button(self.eliminar_window, text="Aceptar", command=self.eliminar).pack()
         ttk.Button(self.eliminar_window, text="Cancelar", command=self.eliminar_window.destroy).pack()
 
@@ -545,7 +552,7 @@ class Inscripciones:
         return num_Inscripcion + 1 if num_Inscripcion else 1
 
     def eliminar(self):
-        eleccion=self.var.get()
+        eleccion=self.delete_option_selected.get()
         if eleccion is not None:
             if eleccion=='1':
                 try:
@@ -555,7 +562,7 @@ class Inscripciones:
                     query = "DELETE FROM Inscritos WHERE No_Inscripcion = ? AND Id_Alumno=? AND Codigo_Curso=?"
                     params = (num_inscripcion, id_alumno, codigo_curso)
                     self.execute_DB_Query(query, params)
-                    self.fill_Inscritos(None)  # Actualiza la vista del treeview
+                    self.fill_Inscritos()  # Actualiza la vista del treeview
                 except IndexError:
                     mssg.showerror("Error")
                 finally:
@@ -565,7 +572,7 @@ class Inscripciones:
                     num_inscripcion = self.num_Inscripcion.get()
                     query = "DELETE FROM Inscritos WHERE No_Inscripcion = ? "
                     self.execute_DB_Query(query, (num_inscripcion,))
-                    self.fill_Inscritos(None)  # Actualiza la vista del treeview
+                    self.fill_Inscritos()  # Actualiza la vista del treeview
                     self.num_Inscripcion.set("")
                     self.fill_Cmboxes()
                 except IndexError:
@@ -586,7 +593,7 @@ class Inscripciones:
             result = self.execute_DB_Query(query, params)
             if result:
                 mssg.showinfo("Inscripción creada", "La inscripción se ha creado exitosamente")
-                self.fill_Inscritos(None) # Actualiza la vista del treeview
+                self.fill_Inscritos() # Actualiza la vista del treeview
             else:
                 mssg.showerror("ERROR", "No se ha podido crear la inscripcion")
         else:
@@ -614,7 +621,7 @@ class Inscripciones:
             result = self.execute_DB_Query(query, params)
             if result:
                 mssg.showinfo("Inscripción actualizada", "La inscripción se ha actualizado exitosamente")
-                self.fill_Inscritos(None)  # Actualiza la vista del treeview
+                self.fill_Inscritos()  # Actualiza la vista del treeview
             else:
                 mssg.showerror("ERROR", "No se ha podido actualizar informacion")
         else:
