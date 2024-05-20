@@ -12,6 +12,7 @@ from datetime import datetime
 logger = logging.getLogger(__name__)
 PATH = str((Path(__file__).resolve()).parent)
 DB_PATH = f"{PATH}/db/Inscripciones.db"
+
 class Inscripciones:
     def __init__(self, master=None):
         # Ventana principal
@@ -61,13 +62,13 @@ class Inscripciones:
         win.configure(background="#f7f9fd", height=600, width=800)
         win.geometry("800x600")
         win.resizable(False, False)
-        win.iconbitmap("icon.ico")
+        win.iconbitmap(f"{PATH}/img/icon.ico")
         win.title("Inscripciones de Materias y Cursos")
         return win
 
     def create_Frame(self, win, frame_name="frm_1"):
         frm_1 = tk.Frame(win, name=frame_name)
-        frm_1.configure(background="#f7f9fd", height=600, width=800)
+        frm_1.configure(height=600, width=800)
         return frm_1
 
     def create_Labels(self, frm_1):
@@ -128,11 +129,11 @@ class Inscripciones:
         entry.place(anchor="nw", width=width, x=x, y=y)
         return entry
 
-    def format_Date_Input(self,event=None):
+    def format_Date_Input(self,  event=None):
         if event.char.isdigit():
             campo=self.fecha.get()
             letras=0
-            for i in campo:
+            for _ in campo:
                 letras +=1
             if letras ==2:self.fecha.insert(2,"/")
             if letras ==5:self.fecha.insert(6,"/")
@@ -181,7 +182,6 @@ class Inscripciones:
 
     def create_Treeview(self, frm_1):
         tView = ttk.Treeview(frm_1, name="tview", style="mystyle.Treeview", selectmode="browse")
-
 
         config_map = {
             "#0": {"width": 7, "minwidth": 7, "heading": '# Inscripción'},
@@ -287,23 +287,43 @@ class Inscripciones:
         self.horario_desde_am.bind("<<ComboboxSelected>>", self.validate_Horario)
         self.horario_hasta_am.bind("<<ComboboxSelected>>", self.validate_Horario)
 
+    def show_Error_Horario(self):
+        mssg.showerror("Error", "La hora de inicio debe ser menor que la hora de finalización")
+
     def validate_Horario(self, _):
         """
         This function validates the 'horario' field to ensure that the 'horario_desde' value is less than the 'horario_hasta' value.
         """
-        if self.horario_desde.get() != "" and self.horario_desde_am.get() != "" and self.horario_hasta.get() != "" and self.horario_hasta_am.get() != "":
-            if self.horario_desde_am.get() == self.horario_hasta_am.get() != "" and self.horario_desde.get() >= self.horario_hasta.get():
-                mssg.showerror("Error", "La hora de inicio debe ser menor que la hora de finalización")
+        horario_desde = self.horario_desde.get()
+        horario_desde_am = self.horario_desde_am.get()
+        horario_hasta = self.horario_hasta.get()
+        horario_hasta_am = self.horario_hasta_am.get()
+
+        if horario_desde == "12:00":
+            self.horario_desde_am.set("M")
+            if horario_hasta_am == "AM":
+                self.show_Error_Horario()
                 return False
-            if self.horario_desde_am.get() == "PM" and self.horario_hasta_am.get() == "AM":
-                mssg.showerror("Error", "La hora de inicio debe ser menor que la hora de finalización")
+
+        if horario_hasta == "12:00":
+            self.horario_hasta_am.set("M")
+            if horario_desde_am == "PM":
+                self.show_Error_Horario()
                 return False
+
+        if all([horario_desde, horario_desde_am, horario_hasta, horario_hasta_am]):
+            if (horario_desde_am == horario_hasta_am and horario_desde >= horario_hasta) or (horario_desde_am == "PM" and horario_hasta_am == "AM"):
+                self.show_Error_Horario()
+                return False
+
         return True
 
     def get_Horario(self):
         """
         This function retrieves the 'horario' value from the 'horario_desde' and 'horario_hasta' comboboxes.
         """
+        if not all([self.horario_desde.get(), self.horario_desde_am.get(), self.horario_hasta.get(), self.horario_hasta_am.get()]):
+            return ""
         horario_desde = self.horario_desde.get() + " " + self.horario_desde_am.get()
         horario_hasta = self.horario_hasta.get() + " " + self.horario_hasta_am.get()
         return f"{horario_desde} - {horario_hasta}"
@@ -317,12 +337,10 @@ class Inscripciones:
         self.tView.delete(*self.tView.get_children())
 
     def cancel_Operation(self):
-        hasData = (self.fecha.get() != "") | (self.nombres.get() != "") | (self.apellidos.get() != "") | (
-        self.cmbx_Id_Curso.get() != "") | (self.descripc_Curso.get() != "") | (self.num_Inscripcion.get() != "") | (
-        self.horario_desde.get() !="") | (self.horario_desde_am.get() != "") | (self.horario_hasta.get() != "") |(
-        self.horario_hasta_am.get()!="")
+        fields = [self.fecha, self.nombres, self.apellidos, self.cmbx_Id_Curso, self.descripc_Curso, self.num_Inscripcion, self.horario_desde, self.horario_desde_am, self.horario_hasta, self.horario_hasta_am]
+        has_Data = any(field.get() != "" for field in fields)
 
-        if  hasData:
+        if  has_Data:
             self.create_Entries(self.frm_1)
             self.fill_Cmboxes()
             self.tView = self.create_Treeview(self.frm_1)
@@ -339,73 +357,69 @@ class Inscripciones:
         self.apellidos.config(state="disabled")
         self.cmbx_Id_Curso.config(state="disabled")
         self.descripc_Curso.config(state="disabled")
-        self.fecha.config(state="disabled")
-        self.horario_desde.config(state="disabled")
-        self.horario_desde_am.config(state="disabled")
-        self.horario_hasta.config(state="disabled")
-        self.horario_hasta_am.config(state="disabled")
 
     def consultar_Inscripcion(self):
-
         item_click = self.tView.focus()
         item_values = self.tView.item(item_click, "values")
+        if len(item_values) == 0:
+            mssg.showerror("Error", "No se ha seleccionado ninguna inscripción para consultar")
+            return
+        cod_curso, id_alumno = item_values[0], item_values[1]
         num_inscripcion = self.num_Inscripcion.get()
-        result = self.leer_Inscripcion(num_inscripcion)
-        datecurs_click = [r for r in result if r[1] ==
-                          item_values[1] and r[3] == item_values[0]]
+        result = self.leer_Inscrito(num_inscripcion, cod_curso, id_alumno)
+        if result is None or len(result) == 0:
+            mssg.showerror("Inscripción no encontrada",
+                          f"No se encontró una inscripción con el número: {num_inscripcion}")
+            return
+        fecha, horario = result[2], result[4]
         if len(result) > 0:
-            getnames = self.leer_Alumnos(item_values[1])
-            self.cmbx_Id_Alumno.delete(item_values[1])
-            self.cmbx_Id_Alumno.set(item_values[1])
+            # Clean all entries
+            self.create_Entries(self.frm_1)
+            # Llenar los combobox
+            self.fill_Cmboxes()
+            self.num_Inscripcion.set(num_inscripcion)
+            self.cmbx_Id_Alumno.set(id_alumno)
             self.fill_Alumno_Data(None)
-            self.cmbx_Id_Curso.delete(0, tk.END)
-            self.cmbx_Id_Curso.set(item_values[0])
+            self.cmbx_Id_Curso.set(cod_curso)
             self.fill_Curso_Data(None)
-            self.fecha.delete(0, tk.END)
-            self.fecha.insert(0, datecurs_click[0][2])
-            self.horario_desde.delete(0, tk.END)
-            self.horario_desde.set('0'+datecurs_click[0][4][0:4])
-            self.horario_desde_am.delete(0, tk.END)
-            self.horario_desde_am.set(datecurs_click[0][4][10::].upper())
-            self.horario_hasta.delete(0, tk.END)
-            self.horario_hasta.set('0'+datecurs_click[0][4][5:9])
-            self.horario_hasta_am.delete(0, tk.END)
-            self.horario_hasta_am.set(datecurs_click[0][4][10::].upper())
-            # self.fill_Inscritos(None)
+            self.fecha.insert(0, fecha)
+            self.horario_desde.set(horario[0:5])
+            self.horario_desde_am.set(horario[6:8])
+            self.horario_hasta.set(horario[11:16])
+            self.horario_hasta_am.set(horario[17:19])
             self.desactivar_Campos()
         else:
             mssg.showinfo("Inscripción no encontrada",
                           f"No se encontró una inscripción con el número: {num_inscripcion}")
             
     def eliminar_Inscripcion(self):
-
         self.op= tk.StringVar()
         self.opcion_Eliminar()
         self.eliminar()
 
     def opcion_Eliminar(self):
-        self.new_win=tk.Toplevel(self.win)
-        self.new_win.title('Eliminar Datos')
+        self.eliminar_window = tk.Toplevel(self.win)
+        self.eliminar_window.title('Eliminar Datos')
         new_win_width = 220
         new_win_height = 180
         # Obtener la resolución de la pantalla
-        screen_width = self.new_win.winfo_screenwidth()
-        screen_height = self.new_win.winfo_screenheight()
+        screen_width = self.eliminar_window.winfo_screenwidth()
+        screen_height = self.eliminar_window.winfo_screenheight()
 
         # Calcular las coordenadas x e y para centrar la ventana
         x = (screen_width - new_win_width) // 2
         y = (screen_height - new_win_height) // 2
 
         # Establecer la geometría de la ventana
-        self.new_win.geometry(f'{new_win_width}x{new_win_height}+{x}+{y}')
-        self.frame=tk.Frame(self.new_win,borderwidth=2,relief="groove")
+        self.eliminar_window.geometry(f'{new_win_width}x{new_win_height}+{x}+{y}')
+        self.frame=tk.Frame(self.eliminar_window,borderwidth=2,relief="groove")
         self.frame.pack(padx=10,pady=10)
         self.var=tk.StringVar()
         self.var.set(None)
         ttk.Radiobutton(self.frame,text="Eliminar uno",variable=self.var,value=1).pack(anchor='w')
         ttk.Radiobutton(self.frame,text="Eliminar todos",variable=self.var,value=2).pack(anchor='w')
-        ttk.Button(self.new_win, text="Aceptar", command=self.eliminar).pack()
-        ttk.Button(self.new_win, text="Cancelar", command=self.new_win.destroy).pack()
+        ttk.Button(self.eliminar_window, text="Aceptar", command=self.eliminar).pack()
+        ttk.Button(self.eliminar_window, text="Cancelar", command=self.eliminar_window.destroy).pack()
 
     def crear_Estilos(self):
         style = ttk.Style(self.win)
@@ -544,15 +558,20 @@ class Inscripciones:
                     self.fill_Inscritos(None)  # Actualiza la vista del treeview
                 except IndexError:
                     mssg.showerror("Error")
+                finally:
+                    self.eliminar_window.destroy()
             elif eleccion=='2':
                 try:
                     num_inscripcion = self.num_Inscripcion.get()
                     query = "DELETE FROM Inscritos WHERE No_Inscripcion = ? "
                     self.execute_DB_Query(query, (num_inscripcion,))
                     self.fill_Inscritos(None)  # Actualiza la vista del treeview
+                    self.num_Inscripcion.set("")
+                    self.fill_Cmboxes()
                 except IndexError:
                     mssg.showerror("Error")
-                self.new_win.destroy()
+                finally:
+                    self.eliminar_window.destroy()
 
     def crear_Inscripcion(self):
         num_inscripcion = self.num_Inscripcion.get()
@@ -563,20 +582,20 @@ class Inscripciones:
 
         query = "INSERT INTO Inscritos (No_Inscripcion, Codigo_Curso, Id_Alumno, Horario, Fecha_Inscripcion) VALUES (?, ?, ?, ?, ?)"
         params = (num_inscripcion, codigo_curso, id_alumno, horario, fecha_Inscripcion)
-        if self.validate_Horario(None) and self.is_Valid_Date(None):
+        if all([num_inscripcion, id_alumno, codigo_curso, horario, fecha_Inscripcion]) and self.validate_Horario(None) and self.is_Valid_Date(None):
             result = self.execute_DB_Query(query, params)
             if result:
                 mssg.showinfo("Inscripción creada", "La inscripción se ha creado exitosamente")
                 self.fill_Inscritos(None) # Actualiza la vista del treeview
             else:
-                mssg.showerror("ERROR", "No se ha podido crear la inscripcion, faltan datos")
+                mssg.showerror("ERROR", "No se ha podido crear la inscripcion")
         else:
             mssg.showerror("ERROR", "No se ha podido crear la inscripcion, faltan datos")
 
-    def leer_Inscripcion(self, num_inscripcion):
-        query = "SELECT * FROM Inscritos WHERE No_Inscripcion = ? "
-        result = self.execute_DB_Query(query, (num_inscripcion,))
-        return result.fetchall()
+    def leer_Inscrito(self, num_inscripcion, cod_curso, id_alumno):
+        query = "SELECT * FROM Inscritos WHERE No_Inscripcion = ? AND Codigo_Curso = ? AND Id_Alumno = ?"
+        result = self.execute_DB_Query(query, (num_inscripcion, cod_curso, id_alumno))
+        return result.fetchone()
     
     def leer_Alumnos(self, id_alumno):
         query = "SELECT * FROM Alumnos WHERE Id_Alumno = ? "
@@ -591,13 +610,13 @@ class Inscripciones:
         fecha_Inscripcion=self.fecha.get()
         query = "UPDATE Inscritos SET Horario = ?, Fecha_Inscripcion = ? WHERE No_Inscripcion = ? AND Id_Alumno=? AND Codigo_Curso=?"
         params = ( horario,fecha_Inscripcion,num_inscripcion,  id_alumno,codigo_curso )
-        if self.validate_Horario(None) and self.is_Valid_Date(None):
+        if all([num_inscripcion, id_alumno, codigo_curso, horario, fecha_Inscripcion]) and self.validate_Horario(None) and self.is_Valid_Date(None):
             result = self.execute_DB_Query(query, params)
             if result:
                 mssg.showinfo("Inscripción actualizada", "La inscripción se ha actualizado exitosamente")
                 self.fill_Inscritos(None)  # Actualiza la vista del treeview
             else:
-                mssg.showerror("ERROR", "No se ha podido actualizar informacion, faltan datos")
+                mssg.showerror("ERROR", "No se ha podido actualizar informacion")
         else:
             mssg.showerror("ERROR", "No se ha podido actualizar informacion, faltan datos")
 
