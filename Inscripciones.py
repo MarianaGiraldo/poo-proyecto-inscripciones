@@ -580,6 +580,9 @@ class Inscripciones:
             elif eleccion=='2':
                 try:
                     num_inscripcion = self.num_Inscripcion.get()
+                    if not all([num_inscripcion]):
+                        mssg.showerror("Error", "No se ha seleccionado ningun registro")
+                        return
                     query = "DELETE FROM Inscritos WHERE No_Inscripcion = ? "
                     if self.execute_DB_Query(query, (num_inscripcion,)):
                         self.num_Inscripcion.set("")
