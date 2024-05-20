@@ -559,24 +559,38 @@ class Inscripciones:
                     num_inscripcion = self.num_Inscripcion.get()
                     id_alumno = self.cmbx_Id_Alumno.get()
                     codigo_curso = self.cmbx_Id_Curso.get()
+                    if not all([num_inscripcion, id_alumno, codigo_curso]):
+                        mssg.showerror("Error", "No se ha seleccionado ningun registro")
+                        return
                     query = "DELETE FROM Inscritos WHERE No_Inscripcion = ? AND Id_Alumno=? AND Codigo_Curso=?"
                     params = (num_inscripcion, id_alumno, codigo_curso)
-                    self.execute_DB_Query(query, params)
-                    self.fill_Inscritos()  # Actualiza la vista del treeview
+                    result = self.execute_DB_Query(query, params)
+                    if result:
+                        self.create_Entries(self.frm_1)
+                        self.num_Inscripcion.set(num_inscripcion)
+                        self.fill_Cmboxes()
+                        self.fill_Inscritos()  # Actualiza la vista del treeview
+                        mssg.showinfo("Registro eliminado", "El inscrito se ha eliminado exitosamente")
+                    else:
+                        mssg.showerror("Error", "No se ha podido eliminar el inscrito")
                 except IndexError:
-                    mssg.showerror("Error")
+                    mssg.showerror("Error", "No se ha seleccionado ningun registro")
                 finally:
                     self.eliminar_window.destroy()
             elif eleccion=='2':
                 try:
                     num_inscripcion = self.num_Inscripcion.get()
                     query = "DELETE FROM Inscritos WHERE No_Inscripcion = ? "
-                    self.execute_DB_Query(query, (num_inscripcion,))
-                    self.fill_Inscritos()  # Actualiza la vista del treeview
-                    self.num_Inscripcion.set("")
-                    self.fill_Cmboxes()
+                    if self.execute_DB_Query(query, (num_inscripcion,)):
+                        self.num_Inscripcion.set("")
+                        self.create_Entries(self.frm_1)
+                        self.fill_Cmboxes()
+                        self.fill_Inscritos()  # Actualiza la vista del treeview
+                        mssg.showinfo("Registros eliminados", f"Todos los inscritos con número de inscripción {num_inscripcion} se han eliminado exitosamente")
+                    else:
+                        mssg.showerror("Error", f"No se ha podido eliminar los inscritos con número de inscripción: {num_inscripcion}")
                 except IndexError:
-                    mssg.showerror("Error")
+                    mssg.showerror("Error", "No se ha seleccionado ningun registro")
                 finally:
                     self.eliminar_window.destroy()
 
